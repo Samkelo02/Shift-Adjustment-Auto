@@ -1,13 +1,22 @@
 {
-  "name": "playwrightprojects",
+  "name": "shift-adjustment-e2e",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {},
+  "description": "End-to-end tests for the Shift Adjustment application",
+  "private": true,
+  "scripts": {
+    "auth": "node scripts/save-auth.js",
+    "test": "playwright test",
+    "test:submission": "node scripts/run-submission-test.js",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:list": "playwright test --list",
+    "report": "playwright show-report"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "devDependencies": {
     "@playwright/test": "^1.63.0",
     "@types/node": "^26.5.0"
