@@ -44,6 +44,20 @@ npm run test:debug
 npm run report
 ```
 
+Run the master-data suite on its own with:
+
+```powershell
+npx.cmd playwright test master-data.spec.js
+```
+
+The master-data tests cover reference-record creation, persisted values, deletion,
+search, filters, exports, column settings, help, user-management forms, integrations,
+and audit filters. Each record test uses a fresh identifier and deletes that exact
+record in a `finally` block, including after failed assertions. A terminated browser
+or unavailable server can prevent cleanup; the cleanup step reports the identifier.
+User access and system notification forms are validated without saving changes.
+The notification end date is calculated at runtime.
+
 The adjustment-submission test changes server-side data and is skipped unless an
 attachment is explicitly supplied:
 
