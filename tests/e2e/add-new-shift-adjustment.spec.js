@@ -1,5 +1,5 @@
 import { test } from '@playwright/test';
-import { adjustmentData } from '../fixtures/test-data.js';
+import { adjustmentData, datesAreExplicit, randomTestDates } from '../fixtures/test-data.js';
 import { HomePage } from '../pages/home.page.js';
 import { NewShiftAdjustmentPage } from '../pages/new-shift-adjustment.page.js';
 
@@ -10,24 +10,38 @@ test.describe('Shift adjustment submission', () => {
   );
 
   test('submits a paid sick-leave adjustment', async ({ page }) => {
+    test.setTimeout(240_000);
     const homePage = new HomePage(page);
     const adjustmentPage = new NewShiftAdjustmentPage(page);
+    const data = { ...adjustmentData };
+    const triedDates = new Set();
+    const maxAttempts = datesAreExplicit ? 1 : 5;
 
-    await test.step('Open a new adjustment for the employee', async () => {
-      await homePage.goto();
-      await homePage.startNewAdjustment();
-      await adjustmentPage.selectEmployee(
-        adjustmentData.employeeSearch,
-        adjustmentData.employeeOption,
-      );
-    });
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      triedDates.add(data.startDate);
+      console.log(`Attempt ${attempt}: ${data.startDate} to ${data.endDate}`);
 
-    await test.step('Complete the adjustment details', async () => {
-      await adjustmentPage.complete(adjustmentData);
-    });
+      await test.step(`Open a new adjustment (attempt ${attempt})`, async () => {
+        await homePage.goto();
+        await homePage.startNewAdjustment();
+        await adjustmentPage.selectEmployee(data.employeeSearch, data.employeeOption);
+      });
 
-    await test.step('Submit and verify success', async () => {
-      await adjustmentPage.submit();
-    });
+      await test.step('Complete and verify adjustment details', async () => {
+        await adjustmentPage.complete(data);
+        await adjustmentPage.verifyDetails(data);
+      });
+
+      const outcome = await test.step('Submit and verify result', async () => adjustmentPage.submit());
+      if (outcome === 'submitted') return;
+      console.log(`Date range ${data.startDate} to ${data.endDate} already exists.`);
+      if (datesAreExplicit) {
+        throw new Error(`An adjustment already exists for ${data.startDate} to ${data.endDate}.`);
+      }
+      if (attempt === maxAttempts) {
+        throw new Error(`All ${maxAttempts} date ranges already have adjustments.`);
+      }
+      Object.assign(data, randomTestDates(triedDates));
+    }
   });
 });

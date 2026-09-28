@@ -59,7 +59,10 @@ User access and system notification forms are validated without saving changes.
 The notification end date is calculated at runtime.
 
 The adjustment-submission test changes server-side data and is skipped unless an
-attachment is explicitly supplied:
+attachment is explicitly supplied. It chooses a random three-day range from the
+past 10–30 days on each run unless both date variables are set. If the app reports
+that the range already exists, it tries another unused range, up to five attempts.
+Explicit date ranges are submitted once:
 
 ```powershell
 npm run test:submission -- 'C:\path\to\test-evidence.jpg'
@@ -74,15 +77,16 @@ All settings are optional unless noted.
 | `SHIFT_ADJUSTMENT_BASE_URL` | Target environment | Current SAP BTP test URL |
 | `PLAYWRIGHT_AUTH_STATE` | Storage-state JSON used by CI | Local auth file |
 | `TEST_ATTACHMENT_PATH` | Enables the data-changing submission test | Test is skipped |
-| `TEST_EMPLOYEE` | Employee surname or number | `Buckle` |
-| `TEST_EMPLOYEE_OPTION` | Exact employee result to select | `Thomas Johannes Buckle` |
-| `TEST_DATE_ACCESSIBLE_NAME` | Accessible calendar date label | `September 10,` |
+| `TEST_EMPLOYEE` | Employee surname or number | `80068191` |
+| `TEST_EMPLOYEE_OPTION` | Exact employee result to select | `Christiaan Van Den Berg` |
+| `TEST_START_DATE` | Override random start date (`YYYY-MM-DD`; set with end date) | Random |
+| `TEST_END_DATE` | Override random end date (`YYYY-MM-DD`; set with start date) | Start date + 2 days |
 | `TEST_ADJUSTMENT_TYPE` | Adjustment type | `Sick Leave - SICK` |
 | `TEST_ABSENCE_TYPE` | Absence type | `Sick leave Paid` |
 | `TEST_LOCATION` | Location | `Mogalakwena` |
 | `TEST_PRACTITIONER_TYPE` | Practitioner type | `Doctor` |
-| `TEST_PRACTITIONER_SEARCH` | Practitioner search text | `Dr` |
-| `TEST_PRACTITIONER_OPTION` | Practitioner option label | Existing test doctor |
+| `TEST_PRACTITIONER_SEARCH` | Practitioner search text | `Dr Samu Test` |
+| `TEST_PRACTITIONER_OPTION` | Practitioner option label | `Dr Samu Test` |
 | `TEST_ADMIN_STATUS` | Administration status filter | `Approved` |
 | `TEST_ADMIN_ABSENCE_TYPE` | Administration absence filter | `Accumulated Leave CD` |
 

@@ -27,16 +27,13 @@ export class NewShiftAdjustmentPage {
     await this.fileInput.setInputFiles(filePath);
   }
 
-  async selectDates(dateAccessibleName) {
-    const datePickers = this.page.locator('ui5-date-picker');
-    await expect(datePickers).toHaveCount(2);
+  async selectDates(startDate, endDate) {
+    const dateInputs = this.page.getByRole('textbox', { name: 'yyyy-MM-dd' });
+    await expect(dateInputs).toHaveCount(2);
 
-    for (const index of [0, 1]) {
-      await datePickers.nth(index).locator('.inputIcon').click();
-      await this.page
-        .getByRole('gridcell', { name: dateAccessibleName })
-        .getByText(/\d+/)
-        .click();
+    for (const [index, date] of [startDate, endDate].entries()) {
+      await dateInputs.nth(index).fill(date);
+      await dateInputs.nth(index).press('Tab');
     }
   }
 
@@ -49,18 +46,19 @@ export class NewShiftAdjustmentPage {
     await this.page.getByText(optionName, { exact: true }).last().click();
   }
 
-  async selectPractitioner(searchText, optionName) {
-    await this.page
-      .locator('#new-shift-adjustment-doctor-medicalPractitionerId-user-search .inputIcon')
-      .click();
+  async selectPractitioner(searchText) {
     const practitionerInput = this.page.getByRole('textbox', { name: 'Doctor Information' });
-    await practitionerInput.fill(searchText);
-    await this.page.getByRole('option', { name: optionName }).click();
+    await practitionerInput.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+    await practitionerInput.fill('');
+    await practitionerInput.pressSequentially(searchText, { delay: 50 });
+    const suggestions = this.page.getByRole('dialog', { name: 'Available Values' });
+    await expect(suggestions).toBeVisible();
+    await this.page.getByRole('option').first().click();
   }
 
   async complete(data) {
     await this.uploadAttachment(data.attachmentPath);
-    await this.selectDates(data.dateAccessibleName);
+    await this.selectDates(data.startDate, data.endDate);
     await this.selectComboBoxOption(undefined, data.adjustmentType);
     await this.selectComboBoxOption('#new-shift-adjustment-absenceTypeId', data.absenceType);
     await this.selectComboBoxOption('#new-shift-adjustment-locationTypeId', data.location);
@@ -68,20 +66,64 @@ export class NewShiftAdjustmentPage {
       '#new-shift-adjustment-medicalPractitionerTypeId',
       data.practitionerType,
     );
-    await this.selectPractitioner(data.practitionerSearch, data.practitionerOption);
+    await this.selectPractitioner(data.practitionerSearch);
+  }
+
+  async verifyDetails(data) {
+    const dateInputs = this.page.getByRole('textbox', { name: 'yyyy-MM-dd' });
+    await expect(dateInputs.nth(0)).toHaveValue(data.startDate);
+    await expect(dateInputs.nth(1)).toHaveValue(data.endDate);
+    await expect(
+      this.page.getByText(data.practitionerOption, { exact: false }).filter({ visible: true }).first(),
+    ).toBeVisible();
   }
 
   async submit() {
-    await this.form.getByRole('button', { name: 'Emphasized' }).last().click();
+    await this.page.getByText('Submit for Approval', { exact: true }).first().click();
     await this.page
       .locator('#confirm-submit-action-modal-confirm-button')
       .getByRole('button', { name: 'Emphasized' })
       .click();
 
-    const successMessage = this.page.locator(
-      '.modal-crossfade-panel--inner ui5-illustrated-message',
-    );
-    await expect(successMessage).toBeVisible();
-    await this.page.getByRole('button', { name: 'Close' }).click();
+    const duplicateMessage = this.page
+      .getByText(/A shift adjustment for this employee and date range already exists/i)
+      .first();
+    const failureHeading = this.page
+      .getByRole('heading', { name: /shift adjustment submission failed/i })
+      .first();
+    const successHeading = this.page
+      .getByRole('heading', { name: /shift adjustment submitted successfully/i })
+      .first();
+    const keepEditingButton = this.page.getByRole('button', { name: 'Keep Editing' }).first();
+    const closeButton = this.page.getByRole('button', { name: 'Close' }).first();
+    let outcome = 'pending';
+    let candidate = 'pending';
+    let candidateSince = Date.now();
+
+    await expect.poll(async () => {
+      let current = 'pending';
+      if (await successHeading.isVisible() && await closeButton.isVisible()) {
+        current = 'submitted';
+      } else if (await keepEditingButton.isVisible()) {
+        if (await duplicateMessage.isVisible()) current = 'duplicate';
+        else if (await failureHeading.isVisible()) current = 'failed';
+      }
+      if (current !== candidate) {
+        candidate = current;
+        candidateSince = Date.now();
+      }
+      outcome = current === 'submitted' ||
+        (current !== 'pending' && Date.now() - candidateSince >= 2_000)
+        ? current : 'pending';
+      return outcome;
+    }, { timeout: 40_000 }).not.toBe('pending');
+
+    if (outcome === 'duplicate') return outcome;
+    if (outcome === 'failed') {
+      throw new Error('Shift adjustment submission failed; inspect the Playwright report.');
+    }
+
+    await closeButton.click();
+    return outcome;
   }
 }
