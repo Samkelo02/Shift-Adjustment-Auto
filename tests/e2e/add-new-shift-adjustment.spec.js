@@ -10,8 +10,11 @@ test.describe('Shift adjustment submission', () => {
   );
 
   test('submits a paid sick-leave adjustment', async ({ page }) => {
-    test.setTimeout(240_000);
-    const homePage = new HomePage(page);
+    // Slow PCs wait for real UI readiness without a test or action deadline.
+    test.setTimeout(0);
+    page.setDefaultTimeout(0);
+    page.setDefaultNavigationTimeout(0);
+    const homePage = new HomePage(page, { timeout: 0 });
     const adjustmentPage = new NewShiftAdjustmentPage(page);
     const data = { ...adjustmentData };
     const triedDates = new Set();

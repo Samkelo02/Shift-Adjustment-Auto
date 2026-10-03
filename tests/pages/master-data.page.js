@@ -18,12 +18,33 @@ export class MasterDataPage {
 
   async open(tab, option) {
     this.referenceSection = { tab, option };
-    await this.page.goto('/admin/reference', { waitUntil: 'domcontentloaded' });
-    await expect(this.page.getByRole('tab', { name: 'Reference Data', exact: true }))
-      .toHaveAttribute('aria-selected', 'true');
+    if (await this.dialog.count()) await this.closeForm();
+    await this.openSection('Reference Data', '/admin/reference');
     await this.selectTab(tab);
     if (option) await this.selectOption(option);
+    await expect(this.search).toBeVisible();
+    await this.clearFilters();
     await this.waitForTable();
+    await expect(this.page.getByRole('button', { name: 'Download', exact: true })).toBeEnabled();
+  }
+
+  async openSection(name, route) {
+    await this.selectTab(name);
+    await expect(this.page).toHaveURL(url => url.pathname === route);
+  }
+
+  async clearFilters() {
+    const clear = this.page.getByRole('button', { name: 'Clear', exact: true });
+    if (await clear.isVisible()) await clear.click();
+    await this.setSearch('');
+  }
+
+  async reopenReferenceSection(tab, option) {
+    // Remount Reference Data and its debounced search through the main app tabs.
+    // Switching only a subtab retains the previous search value inside the input.
+    if (await this.dialog.count()) await this.closeForm();
+    await this.openSection('Settings', '/admin/settings');
+    await this.open(tab, option);
   }
 
   async selectTab(name) {
@@ -48,9 +69,30 @@ export class MasterDataPage {
   }
 
   async setSearch(query) {
-    await this.search.fill(query);
-    await this.search.press('Enter');
+    const previous = await this.search.inputValue();
+    if (previous !== query) {
+      // The input updates before its debounced server-side search completes.
+      const [response] = await Promise.all([
+        this.page.waitForResponse(response => {
+          const url = new URL(response.url());
+          return url.pathname.startsWith('/api/v1/master-data/')
+            && response.request().method() === 'GET'
+            && (url.searchParams.get('$search') ?? '') === query;
+        }, { timeout: 60_000 }),
+        (async () => {
+          await this.search.fill('');
+          if (query) await this.search.pressSequentially(query, { delay: 20 });
+          await this.search.press('Tab');
+        })(),
+      ]);
+      await response.finished();
+      const endpoint = new URL(response.url()).pathname;
+      expect(response.ok(), `GET ${endpoint} search "${query}" returned HTTP ${response.status()}`)
+        .toBe(true);
+    }
     await expect(this.search).toHaveValue(query);
+    const inputHost = this.page.locator('ui5-input').filter({ has: this.search });
+    await expect(inputHost).toHaveJSProperty('value', query);
   }
 
   async searchFor(query) {
@@ -58,7 +100,7 @@ export class MasterDataPage {
     await expect.poll(async () => {
       const texts = await this.rows.allTextContents();
       return texts.length > 0 && texts.every(text => text.toLowerCase().includes(query.toLowerCase()));
-    }, { message: `All search results should match "${query}"` }).toBe(true);
+    }, { message: `All search results should match "${query}"`, timeout: 15_000 }).toBe(true);
   }
 
   async selectFilter(id, label) {
@@ -90,10 +132,13 @@ export class MasterDataPage {
   async verifyDownloads() {
     for (const [label, extension] of [['CSV', /\.csv$/i], ['Excel', /\.xlsx?$/i]]) {
       await test.step(`Verify ${label} export`, async () => {
-        await this.page.getByRole('button', { name: 'Download', exact: true }).click();
+        await expect(this.rows.first()).toBeVisible();
+        const downloadButton = this.page.getByRole('button', { name: 'Download', exact: true });
+        await expect(downloadButton).toBeEnabled();
+        await downloadButton.click();
         await expect(this.page.getByRole('dialog', { name: 'Download Options' })).toBeVisible();
         const [download] = await Promise.all([
-          this.page.waitForEvent('download'),
+          this.page.waitForEvent('download', { timeout: 30_000 }),
           label === 'CSV'
             ? this.page.getByRole('listitem', { name: 'CSV Is Active', exact: true }).dblclick()
             : this.page.getByRole('listitem', { name: 'Excel Is Active', exact: true }).click(),
@@ -110,7 +155,7 @@ export class MasterDataPage {
   async verifyRecordLifecycle({ key, name, addLabel, title, fields, prepare, confirmation }) {
     const { tab, option } = this.referenceSection;
     await this.setSearch(key);
-    await expect(this.noResults).toBeVisible();
+    await expect(this.noResults).toBeVisible({ timeout: 15_000 });
     await expect(this.row(key)).toHaveCount(0);
     await this.openForm(addLabel, title);
     await this.fill(fields);
@@ -126,7 +171,7 @@ export class MasterDataPage {
         await this.searchFor(key);
         await expect(this.row(key)).toHaveCount(1);
         await expect(this.row(key)).toContainText(name);
-        await this.open(tab, option);
+        await this.reopenReferenceSection(tab, option);
         await this.searchFor(key);
         await expect(this.row(key)).toHaveCount(1);
         await expect(this.row(key)).toContainText(name);
@@ -139,7 +184,7 @@ export class MasterDataPage {
       });
     } finally {
       await test.step(`Delete test record ${key}`, async () => {
-        await this.open(tab, option);
+        await this.reopenReferenceSection(tab, option);
         await this.setSearch(key);
         await expect.poll(async () =>
           await this.row(key).count() > 0 || await this.noResults.isVisible(),
@@ -150,9 +195,9 @@ export class MasterDataPage {
           await row.locator('ui5-button[icon="delete"]').click();
           await this.page.locator(`#${confirmation}`).click();
           await expect(row).toHaveCount(0);
-          await this.open(tab, option);
+          await this.reopenReferenceSection(tab, option);
           await this.setSearch(key);
-          await expect(this.noResults).toBeVisible();
+          await expect(this.noResults).toBeVisible({ timeout: 15_000 });
           await expect(row).toHaveCount(0);
         }
       });

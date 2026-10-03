@@ -1,8 +1,9 @@
 # Shift Adjustment Playwright tests
 
 End-to-end browser tests for the Shift Adjustment test application. The suite covers
-submitting an employee absence adjustment plus a non-destructive administration smoke
-tour of the main pages, Insights panels, filters, and responsive layout.
+submitting an employee absence adjustment plus thorough Home page navigation,
+dashboard queue links, browser history, help, notifications, profile menus, Insights
+panels, adjustment filters, and desktop/tablet layout.
 
 ## Requirements
 
@@ -44,13 +45,24 @@ npm run test:debug
 npm run report
 ```
 
+The Home page navigation test loads Home once and keeps the same browser session
+through all navigation steps, without refreshing between checks.
+
+Run the Home page navigation suite on its own with:
+
+```powershell
+npx.cmd playwright test home-page-navigation.spec.js
+```
+
 Run the master-data suite on its own with:
 
 ```powershell
 npx.cmd playwright test master-data.spec.js
 ```
 
-The master-data tests cover reference-record creation, persisted values, deletion,
+The master-data checks share one browser session and use tabs to move between
+sections and verify persisted records, without page refreshes. They cover
+reference-record creation, persisted values, deletion,
 search, filters, exports, column settings, help, user-management forms, integrations,
 and audit filters. Each record test uses a fresh identifier and deletes that exact
 record in a `finally` block, including after failed assertions. A terminated browser
@@ -98,3 +110,142 @@ as a credential and rotate it when the test account changes.
 
 Tests run serially because they share server-side state. Failed runs retain a trace,
 screenshot, video, and HTML report for diagnosis.
+
+## Approve shift adjustment
+
+Run the approval test with:
+
+```powershell
+npx.cmd playwright test approve-shift-adjustment.spec.js
+```
+
+This test opens the Shift Adjustment tab, clears existing filters, filters by
+Submitted, selects the first submitted adjustment, and confirms approval. It
+verifies that the same reference is saved as Approved. The test changes server-side
+data and posts the adjustment to SAP. It requires an Approver or Administrator
+account and at least one submitted adjustment. Retries are disabled to avoid
+approving a second record after a failure.
+
+## Reject shift adjustment
+
+```powershell
+npx.cmd playwright test reject-shift-adjustment.spec.js
+```
+
+The test opens the Shift Adjustment tab, clears existing filters, filters by
+Submitted, selects the first submitted adjustment, and confirms rejection. It
+verifies that the same reference is saved as Rejected. The default reason is
+`Other`, with this rejection comment:
+
+> The submitted shift adjustment does not contain sufficient supporting information to validate the request. Please review the details, provide the required supporting documentation, and resubmit the adjustment for approval
+
+Override the reason and comment using `TEST_REJECTION_REASON` and
+`TEST_REJECTION_COMMENT`. The reason must match an available option exactly.
+This test changes server-side data and communicates the rejection to the
+initiator. It requires an Approver or Administrator account and at least one
+submitted adjustment. Retries are disabled to avoid rejecting a second record
+after a failure.
+
+## Request Recapture
+
+```powershell
+npx.cmd playwright test request-recapture.spec.js
+```
+
+The test opens the Shift Adjustment tab, clears existing filters, selects both
+Posting Failed and Submitted, and checks that the returned rows have one of those
+statuses. It selects the first record, requests recapture, and verifies that the
+same reference is saved as Recapture Requested.
+
+The default reason is `Additional Information Required`. The comment uses the
+supporting-documentation wording configured for the rejection test. Override
+these with `TEST_RECAPTURE_REASON` and `TEST_RECAPTURE_COMMENT`; the reason must
+match an available option exactly. This test changes server-side data and
+communicates the recapture request to the initiator. It requires an account with
+permission to request recapture and at least one Submitted or Posting Failed
+adjustment. Retries are disabled to avoid changing a second record after failure.
+
+## Recall from Submission
+
+```powershell
+npx.cmd playwright test recall-from-submission.spec.js
+```
+
+The test opens the Shift Adjustment tab, clears existing filters, selects
+Submitted, and verifies that the list contains only submitted adjustments. It
+selects the first record, confirms Recall From Submission, checks the success
+message, and verifies that the same reference is saved as Recalled. The app
+returns recalled adjustments to an editable state. No recall reason is required.
+
+This test changes server-side data. It requires an account with permission to
+recall submitted adjustments and at least one Submitted record. Retries are
+disabled to avoid recalling a second record after failure.
+
+## Delete shift adjustment
+
+```powershell
+npx.cmd playwright test delete-shift-adjustment.spec.js
+```
+
+The test opens the Shift Adjustment tab, clears existing filters, selects Draft,
+and verifies that the list contains only drafts. It opens the first draft,
+confirms Yes, Delete, and checks the successful DELETE response for that record.
+It then searches the Draft list for the same reference and verifies no records
+are returned.
+
+This test permanently deletes one existing draft in the target environment. It
+requires an account with permission to delete drafts and at least one Draft
+record. Retries are disabled to avoid deleting a second record after failure.
+
+## Cancel shift adjustment
+
+```powershell
+npx.cmd playwright test cancel-shift-adjustment.spec.js
+```
+
+The test opens the Shift Adjustment tab, clears existing filters, selects both
+Submitted and Posting Failed, and verifies that the returned rows have one of
+those statuses. It opens the first record, chooses More Actions > Cancel,
+completes the required cancellation reason and comments, confirms cancellation,
+and verifies that the same reference is saved as Cancelled.
+
+The default reason is `Administrative Cancellation`, with the comment
+`Cancelled during automated cancellation workflow validation.` Override them
+with `TEST_CANCELLATION_REASON` and `TEST_CANCELLATION_COMMENT`; the reason must
+match an available option exactly. This test changes server-side data. It requires
+permission to cancel adjustments and at least one Submitted or Posting Failed
+record. Retries are disabled to avoid cancelling a second record after failure.
+
+## Navigate through Audit Trail & Notifications
+
+```powershell
+npx.cmd playwright test audit-trail-notifications.spec.js
+```
+
+The test selects every available status except Pending and verifies the selected
+filters and returned rows. It opens a record with history actions; Draft and
+Recalled records open the creation form, so it chooses another status from the
+same list. It opens Audit Trail and Notifications through More Actions, checks
+each reference-specific heading, scrolls through the timeline entries, and
+closes each dialog. Empty notification histories are allowed. The report records
+the selected reference and entry counts. This test views history without
+changing adjustment data or resending notifications. It requires at least one
+record with history actions in the filtered list.
+
+## Help Centre Navigation
+
+```powershell
+npx.cmd playwright test help-centre-navigation.spec.js
+```
+
+The test opens Help from Home, visits FAQ, Guides, and Contact, checks the section
+headings and all four guide cards, revisits Guides and FAQ, and returns to Home.
+It uses the same browser session throughout without refreshing the page.
+
+The Help Centre suite also thoroughly tests FAQ answers, keyboard expansion,
+exclusive accordion behavior, question and answer search, case handling, partial
+queries, punctuation, no-match results, the search clear icon, every role and
+category filter, every role/category combination, combined search and filters,
+filter resets, navigation persistence, and tablet interactions. Expected results
+are derived from the current questions, answers, category badges, and role badges
+so the tests do not require a fixed FAQ count. All checks use the same session.

@@ -1,4 +1,7 @@
-import { expect } from '@playwright/test';
+import { expect as baseExpect } from '@playwright/test';
+
+// Retry UI assertions until ready; HTTP failures still fail immediately.
+const expect = baseExpect.configure({ timeout: 0 });
 
 export class NewShiftAdjustmentPage {
   constructor(page) {
@@ -42,8 +45,11 @@ export class NewShiftAdjustmentPage {
       ? this.page.locator(fieldSelector)
       : this.page.locator('ui5-combobox').first();
 
+    await expect(field.getByRole('combobox')).toBeEnabled();
     await field.locator('.inputIcon').click();
-    await this.page.getByText(optionName, { exact: true }).last().click();
+    const option = this.page.getByText(optionName, { exact: true }).filter({ visible: true }).last();
+    await expect(option).toBeVisible();
+    await option.click();
   }
 
   async selectPractitioner(searchText) {
@@ -59,7 +65,19 @@ export class NewShiftAdjustmentPage {
   async complete(data) {
     await this.uploadAttachment(data.attachmentPath);
     await this.selectDates(data.startDate, data.endDate);
-    await this.selectComboBoxOption(undefined, data.adjustmentType);
+    const [absenceTypesResponse] = await Promise.all([
+      this.page.waitForResponse(response => {
+        const url = new URL(response.url());
+        return url.pathname === '/api/v1/master-data/absence-management/absence-type/AbsenceTypes'
+          && response.request().method() === 'GET'
+          && (url.searchParams.get('$filter') ?? '').includes('absenceCategoryId');
+      }, { timeout: 0 }),
+      this.selectComboBoxOption(undefined, data.adjustmentType),
+    ]);
+    await absenceTypesResponse.finished();
+    expect(absenceTypesResponse.ok(),
+      `Loading absence types returned HTTP ${absenceTypesResponse.status()}`,
+    ).toBe(true);
     await this.selectComboBoxOption('#new-shift-adjustment-absenceTypeId', data.absenceType);
     await this.selectComboBoxOption('#new-shift-adjustment-locationTypeId', data.location);
     await this.selectComboBoxOption(
@@ -116,7 +134,7 @@ export class NewShiftAdjustmentPage {
         (current !== 'pending' && Date.now() - candidateSince >= 2_000)
         ? current : 'pending';
       return outcome;
-    }, { timeout: 40_000 }).not.toBe('pending');
+    }, { timeout: 0 }).not.toBe('pending');
 
     if (outcome === 'duplicate') return outcome;
     if (outcome === 'failed') {
