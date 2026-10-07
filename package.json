@@ -5,7 +5,13 @@
   "private": true,
   "scripts": {
     "auth": "node scripts/save-auth.js",
+    "auth:admin": "node scripts/save-auth.js --role admin",
+    "auth:initiator": "node scripts/save-auth.js --role initiator",
+    "auth:approver": "node scripts/save-auth.js --role approver",
     "test": "playwright test",
+    "test:admin": "playwright test --project=admin",
+    "test:initiator": "playwright test --config=playwright.initiator.config.js",
+    "test:approver": "playwright test --config=playwright.approver.config.js",
     "test:submission": "node scripts/run-submission-test.js",
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",

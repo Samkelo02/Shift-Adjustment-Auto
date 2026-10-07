@@ -6,6 +6,8 @@ const authFile = path.resolve('playwright/.auth/user.json');
 
 export default defineConfig({
   testDir: './tests/e2e',
+  testMatch: ['**/admin/*.spec.js'],
+  metadata: { authRole: 'admin' },
   globalSetup: './tests/support/global-setup.js',
   outputDir: 'test-results',
   fullyParallel: false,
@@ -30,7 +32,7 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'chromium',
+      name: 'admin',
       use: { ...devices['Desktop Chrome'] },
     },
   ],

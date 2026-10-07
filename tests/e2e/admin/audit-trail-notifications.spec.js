@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { HomePage } from '../pages/home.page.js';
-import { AdminAdjustmentsPage } from '../pages/admin-adjustments.page.js';
+import { HomePage } from '../../pages/home.page.js';
+import { AdminAdjustmentsPage } from '../../pages/admin-adjustments.page.js';
 
 test('Navigate through Audit Trail & Notifications', async ({ page }) => {
   test.setTimeout(240_000);

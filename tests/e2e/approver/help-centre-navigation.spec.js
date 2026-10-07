@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { HomePage } from '../pages/home.page.js';
-import { FaqPage, matchingFaqs } from '../pages/faq.page.js';
+import { HomePage } from '../../pages/home.page.js';
+import { FaqPage, matchingFaqs } from '../../pages/faq.page.js';
 
 async function expectHelpCentre(page) {
   await expect(page).toHaveURL(url => url.pathname === '/help-center');
@@ -73,7 +73,7 @@ test('Help Centre Navigation', async ({ page }) => {
 
 
 test('FAQ answers, search, and filters', async ({ page, baseURL }) => {
-  test.setTimeout(360_000);
+  test.setTimeout(600_000);
   page.setDefaultTimeout(60_000);
   const home = new HomePage(page);
   const faq = new FaqPage(page);
@@ -115,7 +115,7 @@ test('FAQ answers, search, and filters', async ({ page, baseURL }) => {
       await faq.expectResults(records);
       await expect(faq.answers).toHaveCount(0);
       test.info().annotations.push({ type: 'FAQ coverage', description:
-        records.length + ' questions, ' + (roles.length - 1) + ' roles, ' + (categories.length - 1) + ' categories' });
+        records.length + ' questions, ' + (roles.length - 1) + ' roles, ' + (categories.length - 1) + ' categories, ' + ((roles.length - 1) * (categories.length - 1)) + ' role/category combinations' });
     });
 
     for (const record of records) {
@@ -140,6 +140,16 @@ test('FAQ answers, search, and filters', async ({ page, baseURL }) => {
       await expect(faq.answers).toHaveCount(0);
     });
 
+    for (const record of records) {
+      await test.step('Search a valid complete question: ' + record.question, async () => {
+        await faq.searchFor(record.question, expected({ query: record.question }));
+        await faq.question(record.question).click();
+        await expect(faq.answer(record.question)).toHaveText(record.answer);
+        await faq.clearSearch(records);
+        await expect(faq.answers).toHaveCount(0);
+      });
+    }
+
     await test.step('Search full questions, partial text, mixed case, answers, and punctuation', async () => {
       const query = records[0].question;
       for (const value of [query, query.toUpperCase(), query.toLowerCase(), query.slice(0, Math.max(8, Math.floor(query.length / 2)))]) {
@@ -150,7 +160,7 @@ test('FAQ answers, search, and filters', async ({ page, baseURL }) => {
       expect(answerOnlyWord, 'Expected a searchable term found in answers but not questions').toBeTruthy();
       await faq.searchFor(answerOnlyWord, expected({ query: answerOnlyWord }));
       expect(await faq.questions.count()).toBeGreaterThan(0);
-      for (const value of ['no-matching-faq-987654321', '[]()^$.*+?\\']) {
+      for (const value of ['no-matching-faq-987654321', '[]()^$.*+?\\', '98765432109876543210', '<script>alert(1)</script>', '不存在的问题-987654321', 'x'.repeat(512)]) {
         await faq.searchFor(value, []);
         await faq.clearSearch(records);
       }
@@ -181,7 +191,15 @@ test('FAQ answers, search, and filters', async ({ page, baseURL }) => {
       for (const category of categories.filter(category => category !== 'All Categories')) {
         await test.step('Combine role ' + role + ' with category ' + category, async () => {
           await faq.select('category', category);
-          await faq.expectResults(expected({ role, category }));
+          const filtered = expected({ role, category });
+          await faq.expectResults(filtered);
+          if (filtered.length > 0) {
+            const query = filtered[0].question;
+            await faq.searchFor(query, expected({ role, category, query }));
+            await faq.clearSearch(filtered);
+          }
+          await faq.searchFor('no-matching-faq-987654321', []);
+          await faq.clearSearch(filtered);
         });
       }
       await faq.select('category', 'All Categories');

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
-import { adminFilterData } from '../fixtures/test-data.js';
-import { AdminAdjustmentsPage } from '../pages/admin-adjustments.page.js';
-import { HomePage } from '../pages/home.page.js';
+import { adminFilterData } from '../../fixtures/test-data.js';
+import { AdminAdjustmentsPage } from '../../pages/admin-adjustments.page.js';
+import { HomePage } from '../../pages/home.page.js';
 
 const insightsPanels = [
   'Overview', 'Absences', 'Ageing', 'Employees', 'User Analytics',

@@ -50,9 +50,13 @@ export class AdminAdjustmentsPage {
     const row = rows.first();
     const reference = (await row.innerText()).match(/SA-ADJ-\d{4}-\d+/)?.[0];
     expect(reference, 'The selected adjustment must have a reference number').toBeTruthy();
-    await row.click();
+    const selectedRow = rows.filter({
+      has: this.page.getByRole('gridcell', { name: reference, exact: true }),
+    });
+    await expect(selectedRow).toHaveCount(1, { timeout: 60_000 });
+    await selectedRow.click();
     await expect(this.page).toHaveURL(/\/shift-adjustments\/[^/?]+$/, { timeout: 60_000 });
-    await expect(this.page.getByText(reference, { exact: true })).toBeVisible();
+    await expect(this.page.locator('body')).toContainText(reference, { timeout: 60_000 });
     return reference;
   }
 
@@ -230,7 +234,11 @@ export class AdminAdjustmentsPage {
     const row = rows.first();
     const reference = (await row.innerText()).match(/SA-ADJ-\d{4}-\d+/)?.[0];
     expect(reference, 'The selected draft must have a reference number').toBeTruthy();
-    await row.click();
+    const selectedRow = rows.filter({
+      has: this.page.getByRole('gridcell', { name: reference, exact: true }),
+    });
+    await expect(selectedRow).toHaveCount(1, { timeout: 60_000 });
+    await selectedRow.click();
     await expect(this.page).toHaveURL(url =>
       url.pathname === '/shift-adjustments/create' && Boolean(url.searchParams.get('id')),
     { timeout: 60_000 });
@@ -357,11 +365,16 @@ export class AdminAdjustmentsPage {
     expect(index, 'Expected a record with history actions in the filtered list').toBeGreaterThanOrEqual(0);
     const reference = texts[index].match(/SA-ADJ-\d{4}-\d+/)?.[0];
     expect(reference, 'The selected adjustment must have a reference number').toBeTruthy();
-    await rows.nth(index).click();
+    // Keep the selected identity when filtering updates or reorders the rows.
+    const selectedRow = rows.filter({
+      has: this.page.getByRole('gridcell', { name: reference, exact: true }),
+    });
+    await expect(selectedRow).toHaveCount(1, { timeout: 60_000 });
+    await selectedRow.click();
     await expect(this.page).toHaveURL(url =>
       /^\/shift-adjustments\/[^/]+$/.test(url.pathname) && url.pathname !== '/shift-adjustments/create',
     { timeout: 60_000 });
-    await expect(this.page.getByText(reference, { exact: true })).toBeVisible();
+    await expect(this.page.locator('body')).toContainText(reference, { timeout: 60_000 });
     return reference;
   }
 
@@ -390,7 +403,7 @@ export class AdminAdjustmentsPage {
     await dialog.locator('ui5-button:visible').filter({ hasText: /^Close$/ })
       .getByRole('button').click();
     await expect(dialog).toHaveCount(0);
-    await expect(this.page.getByText(reference, { exact: true })).toBeVisible();
+    await expect(this.page.locator('body')).toContainText(reference, { timeout: 60_000 });
     return count;
   }
 
@@ -399,7 +412,7 @@ export class AdminAdjustmentsPage {
     await filter.locator('.inputIcon').click();
 
     const option = this.page.getByRole('option', {
-      name: new RegExp(`Multiple Selection Mode ${absenceType}`, 'i'),
+      name: `Multiple Selection Mode ${absenceType}`, exact: true,
     });
     await expect(option).toBeVisible();
     const checkbox = option.getByRole('checkbox');

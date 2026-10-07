@@ -72,7 +72,7 @@ The notification end date is calculated at runtime.
 
 The adjustment-submission test changes server-side data and is skipped unless an
 attachment is explicitly supplied. It chooses a random three-day range from the
-past 10–30 days on each run unless both date variables are set. If the app reports
+past 10Ã¢â‚¬â€œ30 days on each run unless both date variables are set. If the app reports
 that the range already exists, it tries another unused range, up to five attempts.
 Explicit date ranges are submitted once:
 
@@ -249,3 +249,138 @@ category filter, every role/category combination, combined search and filters,
 filter resets, navigation persistence, and tablet interactions. Expected results
 are derived from the current questions, answers, category badges, and role badges
 so the tests do not require a fixed FAQ count. All checks use the same session.
+
+## User Management lifecycle
+
+```powershell
+npx.cmd playwright test user-management.spec.js
+```
+
+This test uses `hendrick.makhomisane@valterraplatinum.com`. It first checks for
+existing active and inactive accounts and fails without changing them if the email
+already exists. It selects Hendrick Makhomisane from Microsoft Entra Directory,
+assigns Viewer access for one available personnel area, saves, and verifies the
+account after reopening User Management.
+
+Cleanup uses the row's delete icon and confirms **Deactivate User**. The application
+retains the record with `isActive=false`; the test verifies removal from Active and
+presence under Inactive. Cleanup also runs after failed post-creation assertions,
+and only changes the ID created by that run. Browser termination or server failure
+can prevent cleanup. Retries are disabled. Because deactivation retains the email,
+a later run stops at the existing-account check. The test requires Administrator
+access and a directory entry for the supplied email.
+
+## Initiator role tests
+
+The Initiator suite uses its own login at `playwright/.auth/initiator.json`.
+The existing admin suite continues to use `playwright/.auth/user.json`.
+
+```powershell
+npm run auth:initiator
+npm run test:initiator
+```
+
+Sign in using an account assigned the Initiator role when saving that session.
+The role is assigned by the application; the test configuration does not change
+an account's permissions. Save an Initiator session for this suite.
+
+The suite covers Home and adjustment-list navigation, browser history, opening
+and leaving the creation form, search with no results and clearing search, FAQ,
+the Initiator guide, and Contact. It also runs the existing paid sick-leave
+submission test under the Initiator session. Submission is skipped unless
+`TEST_ATTACHMENT_PATH` is set; employee and adjustment settings use the same
+`TEST_*` variables documented above. Choose an employee accessible to the Initiator.
+Retries are disabled for this suite to avoid repeating submissions.
+
+```powershell
+$env:TEST_ATTACHMENT_PATH = 'C:\path\to\test-evidence.jpg'
+npm run test:initiator -- add-new-shift-adjustment.spec.js
+```
+
+Run the Initiator workflow tests, or list the suite without opening a browser:
+
+```powershell
+npm run test:initiator -- home-page-navigation.spec.js
+npm run test:initiator -- --list
+```
+
+For CI, provide the Initiator storage-state JSON using the separate
+`PLAYWRIGHT_INITIATOR_AUTH_STATE` secret and run `npm run test:initiator`.
+The current admin workflow remains unchanged. Initiator tests are excluded from
+`npm test`; use the dedicated command to run them. These checks cover permitted
+workflows; assertions for restricted actions require confirmed role access rules.
+
+Initiator workflows live in separate files under tests/e2e/initiator/.
+Each workflow opens Home with its own saved Initiator browser context.
+A failing test does not skip other files.
+
+## Admin role tests
+
+All existing admin specs are grouped in `tests/e2e/admin/` and run under the
+`admin` Playwright project using the saved admin session.
+
+```powershell
+npm run auth:admin
+npm run test:admin
+npm run test:admin -- home-page-navigation.spec.js
+```
+
+`npm test` continues to run the admin suite. Existing single-spec commands still
+work by filename. Initiator workflows stay in `tests/e2e/initiator/`; its
+configuration explicitly reuses only the submission spec from the admin folder
+with the separate Initiator login.
+
+The Initiator workflow suite also checks status selection, combined statuses,
+absence-type filtering, and clearing filters; recalls a Submitted adjustment;
+deletes a Draft; cancels a Submitted or Posting Failed adjustment; and views
+Audit Trail and Notifications. Each action verifies the selected reference or
+ID, and records it in the report. Each workflow opens Home in a fresh browser context. Retries are disabled.
+
+The workflow suite changes existing server data: it recalls one record, permanently deletes
+one draft, and cancels another record. Provide records accessible to the Initiator:
+at least one Draft, one Submitted for recall, another Submitted or Posting Failed
+for cancellation, and an adjustment with history actions. If required records
+are missing, the test fails. A failure does not skip other workflow files.
+Set `TEST_INITIATOR_ABSENCE_TYPE` to override the filter's default `Sick leave Paid`.
+Cancellation reason and comment use `TEST_CANCELLATION_REASON` and
+`TEST_CANCELLATION_COMMENT`, as documented for the admin cancellation test.
+
+Each Initiator workflow has its own file: Home navigation, creation form navigation,
+search, Help, filters, history, recall, deletion, and cancellation.
+Run individual files or choose tests in Playwright UI:
+
+```powershell
+npm run test:initiator -- shift-adjustment-filters.spec.js
+npm run test:initiator -- audit-trail-notifications.spec.js
+npm run test:initiator -- --ui
+```
+
+## Approver login session
+
+Save a separate Approver session at `playwright/.auth/approver.json`:
+
+```powershell
+npm run auth:approver
+```
+
+Sign in with an account assigned the Approver role, navigate to Home, then press
+Enter in the terminal to save the session. The command saves the account's login;
+it does not assign or verify the application's role. Authentication files are
+excluded from Git. Run the same command again to refresh an expired session.
+
+Run the approval, rejection, and recapture workflows with this session:
+
+```powershell
+npm run test:approver
+npm run test:approver -- approve-shift-adjustment.spec.js
+npm run test:approver -- --list
+```
+
+These workflows change existing adjustments, as described above. Retries are
+disabled. The dedicated configuration reuses the existing workflow specs with the
+Approver session; Admin and Initiator commands keep their own sessions.
+
+For CI, provide the complete Approver storage-state JSON through
+`PLAYWRIGHT_APPROVER_AUTH_STATE` and run `npm run test:approver`. The existing
+GitHub Actions workflow runs the Admin suite; an Approver CI job must supply this
+separate secret.

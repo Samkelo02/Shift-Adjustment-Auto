@@ -1,12 +1,12 @@
 import { test, expect } from '@playwright/test';
-import { HomePage } from '../pages/home.page.js';
-import { AdminAdjustmentsPage } from '../pages/admin-adjustments.page.js';
+import { HomePage } from '../../pages/home.page.js';
+import { AdminAdjustmentsPage } from '../../pages/admin-adjustments.page.js';
 
-test.describe('Shift adjustment approval', () => {
-  // A retry could approve a second adjustment.
+test.describe('Shift adjustment recall', () => {
+  // A retry could recall a second adjustment.
   test.describe.configure({ retries: 0 });
 
-  test('Approve shift adjustment', async ({ page }) => {
+  test('Recall from Submission', async ({ page }) => {
     test.setTimeout(240_000);
     page.setDefaultTimeout(60_000);
     const home = new HomePage(page);
@@ -31,12 +31,12 @@ test.describe('Shift adjustment approval', () => {
       test.info().annotations.push({ type: 'adjustment', description: reference });
     });
 
-    await test.step('Approve the selected adjustment', async () => {
-      await adjustments.approveAdjustment();
+    await test.step('Recall the selected adjustment from submission', async () => {
+      await adjustments.recallFromSubmission();
     });
 
-    await test.step('Verify the selected adjustment is saved as Approved', async () => {
-      await adjustments.expectApprovedAdjustment(reference);
+    await test.step('Verify the selected adjustment is saved as Recalled', async () => {
+      await adjustments.expectRecalledAdjustment(reference);
     });
   });
 });

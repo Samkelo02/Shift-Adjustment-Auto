@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { HomePage } from '../pages/home.page.js';
-import { AdminAdjustmentsPage } from '../pages/admin-adjustments.page.js';
+import { HomePage } from '../../pages/home.page.js';
+import { AdminAdjustmentsPage } from '../../pages/admin-adjustments.page.js';
 
 test.describe('Shift adjustment draft deletion', () => {
   // A retry could delete a second draft.

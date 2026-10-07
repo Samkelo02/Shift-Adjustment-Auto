@@ -35,8 +35,11 @@ export class HomePage {
   }
 
   async returnHome() {
-    await expect(this.homeTab).toBeVisible();
-    await this.homeTab.click();
+    const homeNavigation = this.homeTab
+      .or(this.page.getByRole('link', { name: 'Home', exact: true }))
+      .filter({ visible: true }).first();
+    await expect(homeNavigation).toBeVisible({ timeout: this.timeout });
+    await homeNavigation.click();
   }
 
   async openPostingFailures() {

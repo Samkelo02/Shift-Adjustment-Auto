@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
-import { adjustmentData, datesAreExplicit, randomTestDates } from '../fixtures/test-data.js';
-import { HomePage } from '../pages/home.page.js';
-import { NewShiftAdjustmentPage } from '../pages/new-shift-adjustment.page.js';
+import { adjustmentData, datesAreExplicit, randomTestDates } from '../../fixtures/test-data.js';
+import { HomePage } from '../../pages/home.page.js';
+import { NewShiftAdjustmentPage } from '../../pages/new-shift-adjustment.page.js';
 
 test.describe('Shift adjustment submission', () => {
   test.skip(

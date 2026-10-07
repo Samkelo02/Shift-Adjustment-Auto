@@ -1,6 +1,6 @@
 import { randomInt, randomUUID } from 'node:crypto';
 import { test, expect } from '@playwright/test';
-import { MasterDataPage } from '../pages/master-data.page.js';
+import { MasterDataPage } from '../../pages/master-data.page.js';
 
 const referenceCases = [
   {
