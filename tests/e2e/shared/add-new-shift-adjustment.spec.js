@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { test } from '../../support/regression-test.js';
 import { adjustmentData, datesAreExplicit, randomTestDates } from '../../fixtures/test-data.js';
 import { HomePage } from '../../pages/home.page.js';
 import { NewShiftAdjustmentPage } from '../../pages/new-shift-adjustment.page.js';
@@ -6,7 +6,7 @@ import { NewShiftAdjustmentPage } from '../../pages/new-shift-adjustment.page.js
 test.describe('Shift adjustment submission', () => {
   test.skip(
     !adjustmentData.attachmentPath,
-    'Set TEST_ATTACHMENT_PATH to run this data-changing test.',
+    'Set TEST_ATTACHMENT_PATH or place dummy_shift_adjustment_form.pdf in Downloads to run this data-changing test.',
   );
 
   test('submits a paid sick-leave adjustment', async ({ page }) => {

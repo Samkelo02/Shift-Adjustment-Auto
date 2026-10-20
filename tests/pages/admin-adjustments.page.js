@@ -290,6 +290,48 @@ export class AdminAdjustmentsPage {
     await expect(this.page.locator('[role="rowgroup"]:visible [role="row"]')).toHaveCount(0);
   }
 
+  async closeAdjustment() {
+    const action = this.page.locator('ui5-button:visible')
+      .filter({ hasText: /^Close Record \(No Action\)$/ }).getByRole('button');
+    await expect(action).toBeEnabled({ timeout: 60_000 });
+    await action.click();
+    const dialog = this.page.locator('ui5-dialog[open][id^="manualCapture-adjustment-"]');
+    await expect(dialog.getByText(
+      'Are you sure you want to manually capture this shift adjustment?',
+      { exact: true },
+    )).toBeVisible();
+    const confirm = dialog.locator('ui5-button[id$="-confirm-button"]').getByRole('button');
+    await expect(confirm).toBeEnabled();
+    await confirm.click();
+
+    // The initial title also says Closed; wait for the completed result's Close button.
+    const close = dialog.locator('ui5-button:visible').filter({ hasText: /^Close$/ })
+      .getByRole('button');
+    await expect(close).toBeEnabled({ timeout: 60_000 });
+    await expect(dialog).not.toContainText(/Posting Failed|Error Occurred|An error occurred/i);
+    await expect(dialog.getByRole('heading', {
+      name: 'Shift Adjustment Closed', exact: true,
+    }).first()).toBeVisible();
+    await close.click();
+    await expect(this.page).toHaveURL(url => url.pathname === '/shift-adjustments', {
+      timeout: 60_000,
+    });
+  }
+
+  async expectClosedAdjustment(reference) {
+    await this.clearFilters();
+    // The filter uses Close Record; the saved row displays Closed Record.
+    await this.selectStatus('Close Record (No Action)');
+    await this.page.getByRole('textbox', { name: 'Search', exact: true }).fill(reference);
+    const row = this.page.locator('[role="rowgroup"]:visible [role="row"]').filter({
+      has: this.page.getByRole('gridcell', { name: reference, exact: true }),
+    });
+    await expect(row).toHaveCount(1, { timeout: 60_000 });
+    await expect(row).toContainText('Closed Record (No Action)', {
+      timeout: 60_000, useInnerText: true,
+    });
+  }
+
   async cancelAdjustment(reason, comment) {
     await this.page.getByRole('button', { name: 'More Actions', exact: true }).click();
     const menu = this.page.locator('.drop-down-button-action-sheet:visible');
@@ -356,13 +398,16 @@ export class AdminAdjustmentsPage {
   }
 
   async openFirstAdjustmentWithHistory(statuses) {
-    const rows = await this.expectFilteredAdjustments(statuses);
+    const rows = statuses
+      ? await this.expectFilteredAdjustments(statuses)
+      : this.page.locator('[role="rowgroup"]:visible [role="row"]');
+    await expect(rows.first()).toBeVisible({ timeout: 60_000 });
     const texts = await rows.allInnerTexts();
     // Draft and Recalled records open the creation form, which has no history actions.
     const index = texts.findIndex(text => !text.split('\n').some(line =>
       ['Draft', 'Recalled', 'Pending'].includes(line.trim()),
     ));
-    expect(index, 'Expected a record with history actions in the filtered list').toBeGreaterThanOrEqual(0);
+    expect(index, 'Expected a record with history actions in the list').toBeGreaterThanOrEqual(0);
     const reference = texts[index].match(/SA-ADJ-\d{4}-\d+/)?.[0];
     expect(reference, 'The selected adjustment must have a reference number').toBeTruthy();
     // Keep the selected identity when filtering updates or reorders the rows.

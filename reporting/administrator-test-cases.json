@@ -1,0 +1,1739 @@
+{
+  "source": {
+    "fileName": "Shift Adjustment - Administrator Test Cases_Final (1).docx",
+    "title": "Shift Adjustment – Administrator Test Cases_Final",
+    "author": "Bernice van der Merwe",
+    "issueDate": "11 September 2026",
+    "lastSavedDate": "12 September 2026",
+    "columns": [
+      "Scenario",
+      "Test Steps",
+      "Screenshot Evidence",
+      "Expected Result"
+    ],
+    "notes": [
+      "The source contains 36 scenarios. Its numbering omits TC-036; original case IDs are preserved.",
+      "Reference screenshots are baseline illustrations; reports use screenshots captured during the current run."
+    ]
+  },
+  "cases": [
+    {
+      "id": "TC-001",
+      "title": "Access the Shift Adjustment System",
+      "prerequisite": "Admin role is assigned and the user has valid Microsoft/SSO credentials.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Navigate to the Shift Adjustment System application."
+        },
+        {
+          "number": 2,
+          "text": "Enter the registered Microsoft email address and password if requested."
+        },
+        {
+          "number": 3,
+          "text": "Click “Sign In”."
+        },
+        {
+          "number": 4,
+          "text": "Wait for authentication to complete."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The Login Screen is displayed with the Login tab and SSO login option."
+        },
+        {
+          "number": 2,
+          "text": "The credentials are accepted for authentication."
+        },
+        {
+          "number": 3,
+          "text": "The system starts authentication."
+        },
+        {
+          "number": 4,
+          "text": "The user is successfully authenticated and proceeds to the Home Dashboard."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-002",
+      "title": "Verify Home Dashboard",
+      "prerequisite": "User has successfully logged into the Shift Adjustment System.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Observe the Home Dashboard after login."
+        },
+        {
+          "number": 2,
+          "text": "Review Recent Activities."
+        },
+        {
+          "number": 3,
+          "text": "Review Today’s New Submissions."
+        },
+        {
+          "number": 4,
+          "text": "Review key metrics."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The Home Dashboard is displayed."
+        },
+        {
+          "number": 2,
+          "text": "Recently created, updated, or processed records are displayed."
+        },
+        {
+          "number": 3,
+          "text": "Recently submitted adjustments are displayed."
+        },
+        {
+          "number": 4,
+          "text": "Total Pending Approval, Total Posting Failed and Total Recapture Requested are displayed."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-003",
+      "title": "Search and Filter Shift Adjustments",
+      "prerequisite": "At least one shift adjustment exists and the user has access to Shift Adjustments.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Open the Shift Adjustment list option."
+        },
+        {
+          "number": 2,
+          "text": "Enter an employee name, employee number, adjustment ID, Personnel Area or Absence Type in the Search field."
+        },
+        {
+          "number": 3,
+          "text": "Filter by Status."
+        },
+        {
+          "number": 4,
+          "text": "Filter by Absence Type, Personnel Area and Date."
+        },
+        {
+          "number": 5,
+          "text": "Click “Clear”."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The Shift Adjustment list is displayed."
+        },
+        {
+          "number": 2,
+          "text": "Matching records are returned based on the search criteria."
+        },
+        {
+          "number": 3,
+          "text": "Records are filtered according to the selected status."
+        },
+        {
+          "number": 4,
+          "text": "Records are filtered according to the selected criteria."
+        },
+        {
+          "number": 5,
+          "text": "Auto-applied/search filters are removed and the list resets."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-004",
+      "title": "Open an Adjustment from Recent Activities",
+      "prerequisite": "A shift adjustment is available under Recent Activities.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "From the Home Dashboard, locate Recent Activities."
+        },
+        {
+          "number": 2,
+          "text": "Click on an adjustment."
+        },
+        {
+          "number": 3,
+          "text": "Verify the adjustment details are available for review."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "Recent adjustment records are displayed."
+        },
+        {
+          "number": 2,
+          "text": "The capture/adjustment form opens."
+        },
+        {
+          "number": 3,
+          "text": "The selected adjustment is displayed and can proceed to the review/update workflow."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-005",
+      "title": "View and Edit an Existing Adjustment",
+      "prerequisite": "An existing adjustment is available to the Administrator.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Navigate to Shift Adjustments."
+        },
+        {
+          "number": 2,
+          "text": "Select the relevant adjustment."
+        },
+        {
+          "number": 3,
+          "text": "Open “More Actions”."
+        },
+        {
+          "number": 4,
+          "text": "Click “Edit”."
+        },
+        {
+          "number": 5,
+          "text": "Make a permitted change."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The Shift Adjustment list is displayed."
+        },
+        {
+          "number": 2,
+          "text": "The Shift Adjustment details are displayed."
+        },
+        {
+          "number": 3,
+          "text": "Available actions are displayed."
+        },
+        {
+          "number": 4,
+          "text": "The adjustment opens in editable mode."
+        },
+        {
+          "number": 5,
+          "text": "The selected field can be updated."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-006",
+      "title": "Cancel an Existing Adjustment",
+      "prerequisite": "An existing shift adjustment is available for cancellation.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Open the relevant adjustment."
+        },
+        {
+          "number": 2,
+          "text": "Open “More Actions”."
+        },
+        {
+          "number": 3,
+          "text": "Select “Cancel”."
+        },
+        {
+          "number": 4,
+          "text": "Verify the adjustment status."
+        },
+        {
+          "number": 5,
+          "text": "Check notifications."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The Employee Search Bar is available."
+        },
+        {
+          "number": 2,
+          "text": "The employee can be located using the employee number."
+        },
+        {
+          "number": 3,
+          "text": "A dropdown list displays matching employees."
+        },
+        {
+          "number": 4,
+          "text": "The selected employee is loaded into the adjustment."
+        },
+        {
+          "number": 5,
+          "text": "Employee name, employee number, Department, Personnel Area, Payroll area and current absence quota balances are populated."
+        },
+        {
+          "number": 6,
+          "text": "The displayed employee information is correct before proceeding."
+        }
+      ],
+      "reviewNotes": [
+        "The expected results describe employee selection rather than cancellation. The source wording is retained and requires review."
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "Select Employee and Verify Auto-Populated Information",
+      "prerequisite": "A valid employee exists in the system and SAP information is available.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Locate the Employee Search Bar."
+        },
+        {
+          "number": 2,
+          "text": "Search using an employee number."
+        },
+        {
+          "number": 3,
+          "text": "Search using an employee surname."
+        },
+        {
+          "number": 4,
+          "text": "Select the correct employee from the list when searching by surname."
+        },
+        {
+          "number": 5,
+          "text": "Review the auto-populated employee information."
+        },
+        {
+          "number": 6,
+          "text": "Verify the information against SAP."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The Employee Search Bar is available."
+        },
+        {
+          "number": 2,
+          "text": "The employee can be located using the employee number."
+        },
+        {
+          "number": 3,
+          "text": "A dropdown list displays matching employees."
+        },
+        {
+          "number": 4,
+          "text": "The selected employee is loaded into the adjustment."
+        },
+        {
+          "number": 5,
+          "text": "Employee name, employee number, Department, Personnel Area, Payroll area and current absence quota balances are populated."
+        },
+        {
+          "number": 6,
+          "text": "The displayed employee information is correct before proceeding."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-008",
+      "title": "Add Multiple Employees for Training Shift Adjustments",
+      "prerequisite": "Training Shift Adjustment functionality is available and multiple employees are required.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Open the employee selection area for a Training Shift Adjustment."
+        },
+        {
+          "number": 2,
+          "text": "Search for the first required employee."
+        },
+        {
+          "number": 3,
+          "text": "Select the employee."
+        },
+        {
+          "number": 4,
+          "text": "Repeat the search and selection for additional employees."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The employee search/selection function is displayed."
+        },
+        {
+          "number": 2,
+          "text": "The employee is available for selection."
+        },
+        {
+          "number": 3,
+          "text": "The employee is added to the adjustment."
+        },
+        {
+          "number": 4,
+          "text": "Each required employee is added to the Training Shift Adjustment."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-009",
+      "title": "Upload Supporting Documents",
+      "prerequisite": "An adjustment is being captured and supporting documentation is available.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Locate the Evidence Upload section."
+        },
+        {
+          "number": 2,
+          "text": "Click “Upload” or use the drag-and-drop zone."
+        },
+        {
+          "number": 3,
+          "text": "Select a supported PDF, JPG or PNG file."
+        },
+        {
+          "number": 4,
+          "text": "Upload up to 5 files for the adjustment."
+        },
+        {
+          "number": 5,
+          "text": "Review the uploaded documents."
+        },
+        {
+          "number": 6,
+          "text": "Remove a file."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The Evidence Upload section is displayed."
+        },
+        {
+          "number": 2,
+          "text": "The system allows files to be selected/uploaded."
+        },
+        {
+          "number": 3,
+          "text": "The file is uploaded successfully if it meets the supported format and size requirements."
+        },
+        {
+          "number": 4,
+          "text": "Up to 5 files can be attached to a single adjustment."
+        },
+        {
+          "number": 5,
+          "text": "File images/previews are visible and files are correctly named."
+        },
+        {
+          "number": 6,
+          "text": "The selected file is removed from the adjustment."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-010",
+      "title": "Capture Absence Start and End Dates",
+      "prerequisite": "An employee has been selected and the absence details section is available.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Locate “Absence Start Date”."
+        },
+        {
+          "number": 2,
+          "text": "Open the date picker."
+        },
+        {
+          "number": 3,
+          "text": "Select the required start date."
+        },
+        {
+          "number": 4,
+          "text": "Locate “Absence End Date” and open the date picker."
+        },
+        {
+          "number": 5,
+          "text": "Select an end date equal to or after the start date."
+        },
+        {
+          "number": 6,
+          "text": "Attempt to select an end date before the start date."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The Absence Start Date field is available."
+        },
+        {
+          "number": 2,
+          "text": "The calendar/date picker opens."
+        },
+        {
+          "number": 3,
+          "text": "The selected start date is populated in the displayed calendar format."
+        },
+        {
+          "number": 4,
+          "text": "The Absence End Date calendar opens."
+        },
+        {
+          "number": 5,
+          "text": "The selected end date is populated and the date range is valid."
+        },
+        {
+          "number": 6,
+          "text": "The system prevents or flags an invalid date range according to validation rules."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-011",
+      "title": "Capture Partial-Day Absence and Total Hours",
+      "prerequisite": "An employee and valid absence dates have been captured.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Review the absence period."
+        },
+        {
+          "number": 2,
+          "text": "Enable “Partial Day Absence” if available."
+        },
+        {
+          "number": 3,
+          "text": "Enter a Start Time, for example 08:00."
+        },
+        {
+          "number": 4,
+          "text": "Enter an End Time, for example 12:00."
+        },
+        {
+          "number": 5,
+          "text": "Review Total Hours."
+        },
+        {
+          "number": 6,
+          "text": "Verify the calculated hours."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The entered absence period is displayed."
+        },
+        {
+          "number": 2,
+          "text": "Partial-day capture fields are displayed."
+        },
+        {
+          "number": 3,
+          "text": "The start time is accepted."
+        },
+        {
+          "number": 4,
+          "text": "The end time is accepted."
+        },
+        {
+          "number": 5,
+          "text": "The system calculates Total Hours automatically."
+        },
+        {
+          "number": 6,
+          "text": "The calculated hours accurately reflect the captured start and end times."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-012",
+      "title": "Select Absence Category and Filtered Absence Type",
+      "prerequisite": "Employee and absence date information are available.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Open the Absence Category dropdown."
+        },
+        {
+          "number": 2,
+          "text": "Select an appropriate category."
+        },
+        {
+          "number": 3,
+          "text": "Open the Absence Type dropdown."
+        },
+        {
+          "number": 4,
+          "text": "Select the absence type matching the employee’s situation."
+        },
+        {
+          "number": 5,
+          "text": "For SLP or MFP, verify additional requirements."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The available categories are displayed, including AWOP, UL, FR, SLP, MFP, THRD, AL and Other."
+        },
+        {
+          "number": 2,
+          "text": "The selected category is populated."
+        },
+        {
+          "number": 3,
+          "text": "Absence types are filtered according to the selected category."
+        },
+        {
+          "number": 4,
+          "text": "The selected Absence Type is populated."
+        },
+        {
+          "number": 5,
+          "text": "The system displays additional medical- related capture requirements where applicable."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-013",
+      "title": "Select Absence Reason for AWOP and Sick",
+      "prerequisite": "An applicable AWOP or Sick Absence Type has been selected.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Locate the mandatory Absence Reason dropdown."
+        },
+        {
+          "number": 2,
+          "text": "Open the Absence Reason dropdown."
+        },
+        {
+          "number": 3,
+          "text": "Select an applicable reason such as AWOP or NAWP."
+        },
+        {
+          "number": 4,
+          "text": "Confirm the selection."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The Absence Reason field is displayed and mandatory."
+        },
+        {
+          "number": 2,
+          "text": "Reasons are filtered based on the selected Absence Type."
+        },
+        {
+          "number": 3,
+          "text": "The selected reason is populated."
+        },
+        {
+          "number": 4,
+          "text": "The reason remains selected and the form can proceed."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-014",
+      "title": "Capture Medical Location and Practitioner Information",
+      "prerequisite": "A medical-related absence type such as SLP or MFP has been selected.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Locate Location Type."
+        },
+        {
+          "number": 2,
+          "text": "Open the Location Type dropdown."
+        },
+        {
+          "number": 3,
+          "text": "Select the location where medical attention was received/reported."
+        },
+        {
+          "number": 4,
+          "text": "Review the Medical Practitioner Information section."
+        },
+        {
+          "number": 5,
+          "text": "Select a Medical Practitioner Type."
+        },
+        {
+          "number": 6,
+          "text": "If Nurse or Other is selected, enter the Practitioner Name."
+        },
+        {
+          "number": 7,
+          "text": "Alternatively, search for a registered practitioner."
+        },
+        {
+          "number": 8,
+          "text": "Select a registered practitioner."
+        },
+        {
+          "number": 9,
+          "text": "Or add a new Medical Practitioner."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "Location Type is displayed for medical-related absence types."
+        },
+        {
+          "number": 2,
+          "text": "Available medical locations are displayed, including PMHC, Private Doctor/Hospital, Medical Clinics and Other/Unknown."
+        },
+        {
+          "number": 3,
+          "text": "The selected location is populated."
+        },
+        {
+          "number": 4,
+          "text": "The section is displayed for applicable medical-related absences."
+        },
+        {
+          "number": 5,
+          "text": "Doctor, Registered Nurse, Other or blank can be selected as applicable."
+        },
+        {
+          "number": 6,
+          "text": "Practitioner Name is accepted and mandatory for Nurse or Other."
+        },
+        {
+          "number": 7,
+          "text": "The Search Doctors field returns filtered registered practitioners by name or practice number."
+        },
+        {
+          "number": 8,
+          "text": "Available practitioner details are auto-populated."
+        }
+      ],
+      "reviewNotes": [
+        "Nine test steps are supplied, but only eight expected results are supplied."
+      ]
+    },
+    {
+      "id": "TC-015",
+      "title": "Enter Additional Notes",
+      "prerequisite": "The adjustment capture form is open.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Locate the Additional Notes field."
+        },
+        {
+          "number": 2,
+          "text": "Enter relevant additional context or details."
+        },
+        {
+          "number": 3,
+          "text": "Save or continue with the adjustment."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The comments text area is available."
+        },
+        {
+          "number": 2,
+          "text": "The entered information is accepted."
+        },
+        {
+          "number": 3,
+          "text": "The comments remain associated with the adjustment."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-016",
+      "title": "Review Adjustment Details Before Submission",
+      "prerequisite": "An adjustment has been captured, and the Review Adjustment Details page is available.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Open the Shift Adjustment Details page."
+        },
+        {
+          "number": 2,
+          "text": "Review Employee Details."
+        },
+        {
+          "number": 3,
+          "text": "Review Absence Details."
+        },
+        {
+          "number": 4,
+          "text": "Review Supporting Documents."
+        },
+        {
+          "number": 5,
+          "text": "Review Additional Information."
+        },
+        {
+          "number": 6,
+          "text": "Review Error Information."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The details page is displayed."
+        },
+        {
+          "number": 2,
+          "text": "Employee name/number, Personnel Area, leave quota balances, Open Adjustments and AWOPs are displayed."
+        },
+        {
+          "number": 3,
+          "text": "Absence category, type, reason, dates/times, partial-day details and additional information are displayed as applicable."
+        },
+        {
+          "number": 4,
+          "text": "Uploaded documents can be viewed, downloaded or previewed."
+        },
+        {
+          "number": 5,
+          "text": "Comments from the initiator are displayed."
+        },
+        {
+          "number": 6,
+          "text": "System-generated error messages or failure reasons are displayed when applicable."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-017",
+      "title": "Verify Adjustment Status Definitions",
+      "prerequisite": "Test data exists for the applicable workflow statuses.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Locate a DRAFT adjustment."
+        },
+        {
+          "number": 2,
+          "text": "Locate a SUBMITTED adjustment."
+        },
+        {
+          "number": 3,
+          "text": "Locate an APPROVED adjustment."
+        },
+        {
+          "number": 4,
+          "text": "Locate a REJECTED adjustment."
+        },
+        {
+          "number": 5,
+          "text": "Locate a RECAPTURE_REQUESTED adjustment."
+        },
+        {
+          "number": 6,
+          "text": "Locate a POSTING_FAILED adjustment."
+        },
+        {
+          "number": 7,
+          "text": "Locate a CANCELLED adjustment."
+        },
+        {
+          "number": 8,
+          "text": "Locate a CLOSE RECORD adjustment."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "DRAFT means the adjustment is saved but not yet submitted; action is required to complete/submit or delete."
+        },
+        {
+          "number": 2,
+          "text": "SUBMITTED means the adjustment is awaiting approver review; no user action is required while waiting."
+        },
+        {
+          "number": 3,
+          "text": "APPROVED means the adjustment is approved and being processed for SAP posting."
+        },
+        {
+          "number": 4,
+          "text": "REJECTED means the adjustment will not be processed further and the rejection reason should be reviewed."
+        },
+        {
+          "number": 5,
+          "text": "RECAPTURE_REQUESTED means corrections/additional information are required and the adjustment must be edited and resubmitted."
+        },
+        {
+          "number": 6,
+          "text": "POSTING_FAILED indicates a SAP posting error handled by the EB team."
+        },
+        {
+          "number": 7,
+          "text": "CANCELLED indicates the adjustment was cancelled and no further action is required unless the cancellation was in error."
+        },
+        {
+          "number": 8,
+          "text": "CLOSE RECORD is the final state and requires no action."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-018",
+      "title": "Save Adjustment as Draft",
+      "prerequisite": "Required information has been captured sufficiently to save a draft.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Click “Save as Draft”."
+        },
+        {
+          "number": 2,
+          "text": "Verify the adjustment status."
+        },
+        {
+          "number": 3,
+          "text": "Navigate to the dashboard."
+        },
+        {
+          "number": 4,
+          "text": "Reopen the draft."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The adjustment is saved successfully."
+        },
+        {
+          "number": 2,
+          "text": "The status changes to DRAFT."
+        },
+        {
+          "number": 3,
+          "text": "The adjustment appears in Pending My Action."
+        },
+        {
+          "number": 4,
+          "text": "The draft can be returned to and edited."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-019",
+      "title": "Submit Adjustment for Approval",
+      "prerequisite": "The adjustment has been completed and required fields/documents are available.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Click “Submit for Approval”."
+        },
+        {
+          "number": 2,
+          "text": "Review the final summary."
+        },
+        {
+          "number": 3,
+          "text": "Click “Yes, Submit”."
+        },
+        {
+          "number": 4,
+          "text": "Verify the status and queue."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "A confirmation dialog is displayed."
+        },
+        {
+          "number": 2,
+          "text": "The user can review the captured information before submission."
+        },
+        {
+          "number": 3,
+          "text": "The system validates required fields and rules."
+        },
+        {
+          "number": 5,
+          "text": "The adjustment is successfully submitted."
+        },
+        {
+          "number": 6,
+          "text": "Status changes to SUBMITTED and the adjustment moves to the approver’s queue; a confirmation message is displayed."
+        }
+      ],
+      "reviewNotes": [
+        "The source expected-result numbering skips 4 and extends beyond the four test steps."
+      ]
+    },
+    {
+      "id": "TC-020",
+      "title": "Approve a Shift Adjustment",
+      "prerequisite": "A shift adjustment is in a state requiring approver review.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Open the adjustment for review."
+        },
+        {
+          "number": 2,
+          "text": "Click “Approve”."
+        },
+        {
+          "number": 3,
+          "text": "Add comments if required."
+        },
+        {
+          "number": 4,
+          "text": "Confirm approval."
+        },
+        {
+          "number": 5,
+          "text": "Verify the status."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The adjustment details are displayed."
+        },
+        {
+          "number": 2,
+          "text": "The approval action is initiated."
+        },
+        {
+          "number": 3,
+          "text": "Optional comments can be captured."
+        },
+        {
+          "number": 4,
+          "text": "The approval is completed."
+        },
+        {
+          "number": 5,
+          "text": "Status changes to APPROVED and the adjustment proceeds for SAP processing."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-021",
+      "title": "Reject a Shift Adjustment",
+      "prerequisite": "A shift adjustment is available for approver review.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Open the adjustment."
+        },
+        {
+          "number": 2,
+          "text": "Click “Reject”."
+        },
+        {
+          "number": 3,
+          "text": "Leave the rejection reason blank and attempt to continue."
+        },
+        {
+          "number": 4,
+          "text": "Enter a rejection reason."
+        },
+        {
+          "number": 5,
+          "text": "Anter additional Comments."
+        },
+        {
+          "number": 6,
+          "text": "Confirm rejection."
+        },
+        {
+          "number": 7,
+          "text": "Verify status and notification."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The adjustment details are displayed."
+        },
+        {
+          "number": 2,
+          "text": "The rejection action is initiated."
+        },
+        {
+          "number": 3,
+          "text": "The system requires a rejection reason."
+        },
+        {
+          "number": 4,
+          "text": "The rejection reason is accepted."
+        },
+        {
+          "number": 5,
+          "text": "The adjustment is rejected."
+        },
+        {
+          "number": 6,
+          "text": "Status changes to REJECTED and a notification mail is received by the Initiator."
+        }
+      ],
+      "reviewNotes": [
+        "The source has seven test steps and six expected results; their numbering does not establish a reliable one-to-one match."
+      ]
+    },
+    {
+      "id": "TC-022",
+      "title": "Request Recapture of a Shift Adjustment",
+      "prerequisite": "A shift adjustment is available for approver review and requires corrections.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Open the adjustment."
+        },
+        {
+          "number": 2,
+          "text": "Click “Request Recapture”."
+        },
+        {
+          "number": 3,
+          "text": "Enter the reason for recapture."
+        },
+        {
+          "number": 4,
+          "text": "Confirm the request."
+        },
+        {
+          "number": 5,
+          "text": "Verify the status."
+        },
+        {
+          "number": 6,
+          "text": "Check the Initiator notification."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The adjustment details are displayed."
+        },
+        {
+          "number": 2,
+          "text": "The recapture action is initiated."
+        },
+        {
+          "number": 3,
+          "text": "The recapture reason is accepted."
+        },
+        {
+          "number": 4,
+          "text": "The request is completed."
+        },
+        {
+          "number": 5,
+          "text": "Status changes to RECAPTURE REQUESTED."
+        },
+        {
+          "number": 6,
+          "text": "A notification mail is received by the Initiator."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-023",
+      "title": "Recall a Submitted Adjustment",
+      "prerequisite": "A shift adjustment is in SUBMITTED status and has not yet been approved; Recall/Withdraw is available.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Navigate to Shift Adjustments."
+        },
+        {
+          "number": 2,
+          "text": "Find the submitted adjustment."
+        },
+        {
+          "number": 3,
+          "text": "Click “Recall” or “Withdraw” if available."
+        },
+        {
+          "number": 4,
+          "text": "Provide a reason for recall."
+        },
+        {
+          "number": 5,
+          "text": "Confirm the recall."
+        },
+        {
+          "number": 6,
+          "text": "Verify the status."
+        },
+        {
+          "number": 7,
+          "text": "Edit and resubmit if required."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The Shift Adjustment list is displayed."
+        },
+        {
+          "number": 2,
+          "text": "The relevant adjustment is displayed with SUBMITTED status."
+        },
+        {
+          "number": 3,
+          "text": "The system initiates the recall process."
+        },
+        {
+          "number": 4,
+          "text": "The recall reason is captured."
+        },
+        {
+          "number": 5,
+          "text": "The adjustment is recalled."
+        },
+        {
+          "number": 6,
+          "text": "The adjustment status changes to DRAFT."
+        },
+        {
+          "number": 7,
+          "text": "The recalled adjustment can be edited and resubmitted."
+        }
+      ],
+      "reviewNotes": [
+        "The reference expects DRAFT after recall; the existing automation expects Recalled. This difference requires review."
+      ]
+    },
+    {
+      "id": "TC-024",
+      "title": "Monitor Adjustment Status and Audit Trail",
+      "prerequisite": "An adjustment has progressed through one or more workflow actions.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Open the adjustment after review."
+        },
+        {
+          "number": 2,
+          "text": "Verify available statuses."
+        },
+        {
+          "number": 3,
+          "text": "Open the Audit Trail."
+        },
+        {
+          "number": 4,
+          "text": "Review status history."
+        },
+        {
+          "number": 5,
+          "text": "Review actions and timestamps."
+        },
+        {
+          "number": 6,
+          "text": "Verify notifications."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "A confirmation message/status information is displayed."
+        },
+        {
+          "number": 2,
+          "text": "APPROVED, REJECTED, RECAPTURE_REQUESTED and POSTING_FAILED are displayed when applicable."
+        },
+        {
+          "number": 3,
+          "text": "The Audit Trail is available."
+        },
+        {
+          "number": 4,
+          "text": "Status changes are recorded."
+        },
+        {
+          "number": 5,
+          "text": "Actions taken and timestamps are recorded in the audit trail."
+        },
+        {
+          "number": 6,
+          "text": "Email/SMS notification is sent for applicable workflow events."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-025",
+      "title": "Verify Session Timeout Behaviour",
+      "prerequisite": "User is logged into the Shift Adjustment System.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Log in successfully and leave the application idle for the configured timeout period."
+        },
+        {
+          "number": 2,
+          "text": "Choose to Stay Logged in / Logout."
+        },
+        {
+          "number": 3,
+          "text": "Log in again."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The session remains active until the timeout threshold is reached."
+        },
+        {
+          "number": 2,
+          "text": "The user session has expired and the user is returned to the login screen."
+        },
+        {
+          "number": 3,
+          "text": "The user is required to re-authenticate before continuing."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-026",
+      "title": "Validate Document Upload Limits and File Types",
+      "prerequisite": "An adjustment is being captured and the Evidence Upload section is available.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Upload a valid PDF, JPG and PNG file individually."
+        },
+        {
+          "number": 2,
+          "text": "Attempt to upload a 6th file after 5 files have already been attached."
+        },
+        {
+          "number": 3,
+          "text": "Attempt to upload a file in an unsupported format (i.e. not PDF, JPG or PNG)."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "A validation error is displayed and the upload is prevented."
+        },
+        {
+          "number": 2,
+          "text": "The upload is prevented and an error message is displayed."
+        },
+        {
+          "number": 3,
+          "text": "Each file uploads successfully and the correct file name is displayed."
+        }
+      ],
+      "reviewNotes": [
+        "The expected results appear in a different order from the upload test steps. The source wording is retained."
+      ]
+    },
+    {
+      "id": "TC-027",
+      "title": "Validate Mandatory Medical Practitioner Fields",
+      "prerequisite": "A medical-related absence type (e.g. SLP or MFP) has been selected and the Medical Practitioner section is displayed.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Select “Nurse” as the Practitioner Type and leave the Medical Practitioner Name blank."
+        },
+        {
+          "number": 2,
+          "text": "Select “Other” as the Practitioner Type and leave the Practitioner Name blank."
+        },
+        {
+          "number": 3,
+          "text": "Select “Doctor” and leave the Doctor Information blank"
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "Practitioner Name is not mandatory, and Adjustment can be submitted."
+        },
+        {
+          "number": 2,
+          "text": "Practitioner Name is not mandatory, and Adjustment can be submitted."
+        },
+        {
+          "number": 3,
+          "text": "Error displayed that Medical practitioner is required."
+        }
+      ],
+      "reviewNotes": [
+        "The title refers to mandatory practitioner fields, but Nurse and Other expected results say the name is not mandatory. The source wording is retained."
+      ]
+    },
+    {
+      "id": "TC-028",
+      "title": "Verify Handling of a SAP Posting Failure",
+      "prerequisite": "An approved adjustment can be used to simulate or reproduce a SAP posting failure, or a POSTING_FAILED record is available in a test environment.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Trigger or locate an adjustment that results in a SAP posting failure."
+        },
+        {
+          "number": 2,
+          "text": "Open the failed adjustment and review the error information."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The adjustment status changes to POSTING_FAILED and the failure is logged."
+        },
+        {
+          "number": 2,
+          "text": "The posting failure detail is available for review and coordination with the EB team."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-029",
+      "title": "Capture a Single-Day Absence (Same Start and End Date)",
+      "prerequisite": "An employee has been selected and the absence details section is available.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Select the same date for both Absence Start Date and Absence End Date."
+        },
+        {
+          "number": 2,
+          "text": "Continue with the remainder of the capture and confirm no date-related error is raised."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The date range is accepted without validation error."
+        },
+        {
+          "number": 2,
+          "text": "The adjustment can proceed with a one-day absence period."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-030",
+      "title": "Validate Partial-Day End Time Before Start Time",
+      "prerequisite": "Partial Day Absence has been enabled for a captured absence.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Enter a Start Time, for example 12:00."
+        },
+        {
+          "number": 2,
+          "text": "Enter an End Time earlier than the Start Time, for example 08:00."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The start time is accepted."
+        },
+        {
+          "number": 2,
+          "text": "The system flags or prevents the invalid time range with a validation error."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-031",
+      "title": "Verify Admin Role Access on Login",
+      "prerequisite": "A test account with the Administrator role assigned is available.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Log in using an account with the Admin role assigned."
+        },
+        {
+          "number": 2,
+          "text": "Review the available menus and configuration options."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The user is authenticated successfully."
+        },
+        {
+          "number": 2,
+          "text": "Admin menus and configuration options are visible and accessible."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-032",
+      "title": "Verify Access Restrictions for Non-Admin Roles",
+      "prerequisite": "A test account without the Administrator role is available.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Log in using an account that does not have the Admin role assigned."
+        },
+        {
+          "number": 2,
+          "text": "Review the available menus and options."
+        },
+        {
+          "number": 3,
+          "text": "Attempt to navigate directly to a configuration/admin screen."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The user is authenticated successfully."
+        },
+        {
+          "number": 2,
+          "text": "Admin menus and configuration options are hidden or unavailable."
+        },
+        {
+          "number": 3,
+          "text": "Access is denied."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-033",
+      "title": "Update an Existing User's Details",
+      "prerequisite": "Administrator has access to User Management and an existing user record is available.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Navigate to User Management and select an existing user."
+        },
+        {
+          "number": 2,
+          "text": "Edit a field, e.g. role or Personnel Area assignment."
+        },
+        {
+          "number": 3,
+          "text": "Save the changes."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The user's current details are displayed."
+        },
+        {
+          "number": 2,
+          "text": "The field is updated."
+        },
+        {
+          "number": 3,
+          "text": "The changes are saved successfully and reflected on the user's record."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-034",
+      "title": "Disable User Access",
+      "prerequisite": "Administrator has access to User Management and an existing test user account is available.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Navigate to User Management and select an existing user."
+        },
+        {
+          "number": 2,
+          "text": "Deactivate/disable the user's access."
+        },
+        {
+          "number": 3,
+          "text": "Attempt to log in using the disabled account."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The user's details are displayed."
+        },
+        {
+          "number": 2,
+          "text": "The user account is disabled."
+        },
+        {
+          "number": 3,
+          "text": "The user is unable to log in."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-035",
+      "title": "Configure Users, Roles and Personnel Areas",
+      "prerequisite": "Administrator has access to the Configuration screen and approved configuration requirements.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Navigate to the Configuration screen."
+        },
+        {
+          "number": 2,
+          "text": "Open User Management."
+        },
+        {
+          "number": 3,
+          "text": "Create a user by searching the AD by mail address."
+        },
+        {
+          "number": 4,
+          "text": "Assign a role."
+        },
+        {
+          "number": 5,
+          "text": "Assign a Personnel Area."
+        },
+        {
+          "number": 6,
+          "text": "Verify access based on the configured assignment."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The Configuration screen is displayed."
+        },
+        {
+          "number": 2,
+          "text": "Users configuration is available."
+        },
+        {
+          "number": 3,
+          "text": "A new user can be created using the available configuration."
+        },
+        {
+          "number": 4,
+          "text": "The selected role is assigned to the user."
+        },
+        {
+          "number": 5,
+          "text": "The Personnel Area is assigned to the user."
+        },
+        {
+          "number": 6,
+          "text": "The user’s access is controlled according to the configured role and Personnel Area."
+        }
+      ],
+      "reviewNotes": []
+    },
+    {
+      "id": "TC-037",
+      "title": "Configure Reference Data and Notifications",
+      "prerequisite": "Administrator has access to reference data and notification settings.",
+      "testSteps": [
+        {
+          "number": 1,
+          "text": "Open Organisational Structure reference data."
+        },
+        {
+          "number": 2,
+          "text": "Open Personnel Areas & Sub Areas."
+        },
+        {
+          "number": 3,
+          "text": "Open Absence Management reference data."
+        },
+        {
+          "number": 4,
+          "text": "Configure a category and link an applicable type."
+        },
+        {
+          "number": 5,
+          "text": "Open Medical Practitioners."
+        },
+        {
+          "number": 6,
+          "text": "Open Reason & System Codes."
+        },
+        {
+          "number": 7,
+          "text": "Open Notifications settings."
+        },
+        {
+          "number": 8,
+          "text": "Verify Submit, Approve, Reject notifications per role."
+        }
+      ],
+      "expectedResults": [
+        {
+          "number": 1,
+          "text": "The organisational hierarchy can be maintained."
+        },
+        {
+          "number": 2,
+          "text": "Access control groups can be defined and maintained."
+        },
+        {
+          "number": 3,
+          "text": "Categories, Types, Reasons and Locations can be configured."
+        },
+        {
+          "number": 4,
+          "text": "The configured type is linked to the selected category and available according to configuration."
+        },
+        {
+          "number": 5,
+          "text": "Practitioner records can be maintained."
+        },
+        {
+          "number": 6,
+          "text": "Error Codes and Action Reasons can be maintained."
+        },
+        {
+          "number": 7,
+          "text": "Notification triggers and recipients can be configured."
+        },
+        {
+          "number": 8,
+          "text": "The notification triggers are configurable with recipients by role."
+        }
+      ],
+      "reviewNotes": []
+    }
+  ]
+}

@@ -1,14 +1,11 @@
 import { stat } from 'node:fs/promises';
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../../support/regression-test.js';
+import { activeDataRows, searchAndExpectRows } from '../../support/insights-checks.js';
 
 const periods = {
   'This Month': 'this-month',
   'This Year': 'this-year',
 };
-
-function activeDataRows(page) {
-  return page.locator('[role="rowgroup"]:visible [role="row"]:visible');
-}
 
 async function selectPeriod(page, label) {
   const periodFilter = page.locator('#period-filter:visible');
@@ -25,33 +22,6 @@ async function selectPersonnelArea(page, area) {
   const matchingOption = page.getByRole('option', { name: new RegExp(`${escapedArea}$`, 'i') }).last();
   await expect(matchingOption).toBeVisible();
   await matchingOption.click();
-}
-
-async function searchAndExpectRows(page, query, expectedText = query, { soft = false } = {}) {
-  const search = page.getByRole('textbox', { name: 'Search' });
-  await search.fill(query);
-
-  if (soft) {
-    await page.waitForTimeout(1_000);
-    const rowTexts = await activeDataRows(page).allInnerTexts();
-    expect.soft(rowTexts, `Search for "${query}" should return a matching record`).toEqual(
-      expect.arrayContaining([expect.stringMatching(new RegExp(expectedText, 'i'))]),
-    );
-    for (const rowText of rowTexts) {
-      expect.soft(rowText, `Search for "${query}" returned an unrelated record`).toMatch(
-        new RegExp(expectedText, 'i'),
-      );
-    }
-    return;
-  }
-
-  await expect
-    .poll(async () => activeDataRows(page).allInnerTexts())
-    .toEqual(expect.arrayContaining([expect.stringMatching(new RegExp(expectedText, 'i'))]));
-
-  for (const rowText of await activeDataRows(page).allInnerTexts()) {
-    expect(rowText).toMatch(new RegExp(expectedText, 'i'));
-  }
 }
 
 async function searchUsingFirstRowOrVerifyEmpty(page, options) {
@@ -183,7 +153,8 @@ test.describe('Detailed Insights coverage', () => {
       await page.getByRole('button', { name: 'Clear' }).click();
       await page.getByRole('option', { name: 'User Adoption', exact: true }).click();
       await expect(page.getByRole('option', { name: 'User Adoption', exact: true })).toHaveAttribute('aria-selected', 'true');
-      await selectPeriod(page, 'This Month');
+      // Known search records can belong to earlier months in the current year.
+      await selectPeriod(page, 'This Year');
       await selectPersonnelArea(page, 'Mogalakwena Mining');
       await searchAndExpectRows(page, 'Initiator', 'Initiator', { soft: true });
       for (const rowText of await activeDataRows(page).allInnerTexts()) {
@@ -210,7 +181,8 @@ test.describe('Detailed Insights coverage', () => {
       await page.getByRole('button', { name: 'Clear' }).click();
       await page.getByRole('option', { name: 'Posting Failures', exact: true }).click();
       await expect(page.getByRole('option', { name: 'Posting Failures', exact: true })).toHaveAttribute('aria-selected', 'true');
-      await selectPeriod(page, 'This Month');
+      // Known search records can belong to earlier months in the current year.
+      await selectPeriod(page, 'This Year');
       await searchAndExpectRows(page, '014');
       await expect(page.getByRole('row', { name: /014 Quota Insufficient/i })).toBeVisible();
     });

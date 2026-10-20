@@ -7,3 +7,8 @@ node_modules/
 /playwright/.cache/
 /playwright/.auth/
 .env
+
+/regression-reports/
+/.report-validation/
+
+/.home-navigation-validation/

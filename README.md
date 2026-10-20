@@ -45,8 +45,29 @@ npm run test:debug
 npm run report
 ```
 
-The Home page navigation test loads Home once and keeps the same browser session
-through all navigation steps, without refreshing between checks.
+Administrator, Approver, and Employee Benefits use the shared Home navigation
+workflow in `tests/e2e/shared/home-page-navigation.spec.js` through their role entry
+files. It loads Home once and retains the same browser session for role verification,
+main tabs, browser history, Help, notifications, profile dismissal, and desktop/tablet
+navigation at widths of 1440 and 768 pixels. Each role uses its own saved login.
+
+Administrator checks global dashboard cards, their navigation links, and opening
+New Shift Adjustment without submitting. Approver checks personal review metrics
+and verifies that New Shift Adjustment is hidden. Employee Benefits dashboard card
+labels and creation permission still need confirmation; the test records this as a
+coverage-gap annotation rather than treating those permissions as verified.
+
+Detailed Insights and Help checks remain in their dedicated suites. The existing
+Administrator search and filter checks now run in
+`tests/e2e/admin/shift-adjustment-filters.spec.js`.
+
+Run the shared Home workflow with a specific role:
+
+```powershell
+npm run test:admin -- home-page-navigation.spec.js
+npm run test:approver -- home-page-navigation.spec.js
+npm run test:employee-benefits -- home-page-navigation.spec.js
+```
 
 Run the Home page navigation suite on its own with:
 
@@ -63,15 +84,17 @@ npx.cmd playwright test master-data.spec.js
 The master-data checks share one browser session and use tabs to move between
 sections and verify persisted records, without page refreshes. They cover
 reference-record creation, persisted values, deletion,
-search, filters, exports, column settings, help, user-management forms, integrations,
+search, filters, exports, column settings, help, user-management filters, integrations,
 and audit filters. Each record test uses a fresh identifier and deletes that exact
 record in a `finally` block, including after failed assertions. A terminated browser
 or unavailable server can prevent cleanup; the cleanup step reports the identifier.
-User access and system notification forms are validated without saving changes.
+The Master Data suite checks user filters, searches for the existing directory user, and verifies activation and deactivation in the same browser session. System notification forms are validated without saving changes.
 The notification end date is calculated at runtime.
 
-The adjustment-submission test changes server-side data and is skipped unless an
-attachment is explicitly supplied. It chooses a random three-day range from the
+The adjustment-submission test changes server-side data. All roles use
+Downloads/dummy_shift_adjustment_form.pdf in the current user's home folder by default.
+Set TEST_ATTACHMENT_PATH to override it. The test is skipped if no override is set
+and the default PDF is missing. It chooses a random three-day range from the
 past 10Ã¢â‚¬â€œ30 days on each run unless both date variables are set. If the app reports
 that the range already exists, it tries another unused range, up to five attempts.
 Explicit date ranges are submitted once:
@@ -88,7 +111,7 @@ All settings are optional unless noted.
 | --- | --- | --- |
 | `SHIFT_ADJUSTMENT_BASE_URL` | Target environment | Current SAP BTP test URL |
 | `PLAYWRIGHT_AUTH_STATE` | Storage-state JSON used by CI | Local auth file |
-| `TEST_ATTACHMENT_PATH` | Enables the data-changing submission test | Test is skipped |
+| `TEST_ATTACHMENT_PATH` | Overrides the shared submission attachment for every role | `~/Downloads/dummy_shift_adjustment_form.pdf` if present; otherwise skipped |
 | `TEST_EMPLOYEE` | Employee surname or number | `80068191` |
 | `TEST_EMPLOYEE_OPTION` | Exact employee result to select | `Christiaan Van Den Berg` |
 | `TEST_START_DATE` | Override random start date (`YYYY-MM-DD`; set with end date) | Random |
@@ -253,22 +276,27 @@ so the tests do not require a fixed FAQ count. All checks use the same session.
 ## User Management lifecycle
 
 ```powershell
-npx.cmd playwright test user-management.spec.js
+npm run test:admin -- master-data.spec.js
 ```
 
-This test uses `hendrick.makhomisane@valterraplatinum.com`. It first checks for
-existing active and inactive accounts and fails without changing them if the email
-already exists. It selects Hendrick Makhomisane from Microsoft Entra Directory,
-assigns Viewer access for one available personnel area, saves, and verifies the
-account after reopening User Management.
+The lifecycle runs as an independent Master Data test, using
+`tests/support/user-management-lifecycle.js`. It searches for the existing
+`hendrick.makhomisane@valterraplatinum.com` account under Active or Inactive.
+It never adds a user. A missing or duplicate account fails the test.
 
-Cleanup uses the row's delete icon and confirms **Deactivate User**. The application
-retains the record with `isActive=false`; the test verifies removal from Active and
-presence under Inactive. Cleanup also runs after failed post-creation assertions,
-and only changes the ID created by that run. Browser termination or server failure
-can prevent cleanup. Retries are disabled. Because deactivation retains the email,
-a later run stops at the existing-account check. The test requires Administrator
-access and a directory entry for the supplied email.
+If inactive, the test activates the account and verifies it under Active and
+absent under Inactive. If already active, it verifies the active state instead.
+The test verifies read-only profile fields, cancels an unsaved role change, then
+saves a temporary role change using the original personnel-area assignments. It
+checks that personnel areas and Insights access are preserved and restores the
+original role in a `finally` block.
+
+The final step deactivates that same account, verifies removal from Active, and
+confirms the retained record under Inactive with `isActive=false`. This step also
+runs after an activation verification failure. A browser termination or unavailable
+server can prevent deactivation; the report identifies the selected account ID.
+The workflow can run again against the retained account. Administrator access is
+required, and retries are disabled for the Master Data suite.
 
 ## Initiator role tests
 
@@ -287,8 +315,8 @@ an account's permissions. Save an Initiator session for this suite.
 The suite covers Home and adjustment-list navigation, browser history, opening
 and leaving the creation form, search with no results and clearing search, FAQ,
 the Initiator guide, and Contact. It also runs the existing paid sick-leave
-submission test under the Initiator session. Submission is skipped unless
-`TEST_ATTACHMENT_PATH` is set; employee and adjustment settings use the same
+submission test under the Initiator session. Submission uses the shared Downloads
+PDF unless `TEST_ATTACHMENT_PATH` overrides it; employee and adjustment settings use the same
 `TEST_*` variables documented above. Choose an employee accessible to the Initiator.
 Retries are disabled for this suite to avoid repeating submissions.
 
@@ -316,7 +344,7 @@ A failing test does not skip other files.
 
 ## Admin role tests
 
-All existing admin specs are grouped in `tests/e2e/admin/` and run under the
+Admin-specific specs are grouped in `tests/e2e/admin/`; common adjustment workflows live in `tests/e2e/shared/`. Both run under the
 `admin` Playwright project using the saved admin session.
 
 ```powershell
@@ -368,7 +396,7 @@ Enter in the terminal to save the session. The command saves the account's login
 it does not assign or verify the application's role. Authentication files are
 excluded from Git. Run the same command again to refresh an expired session.
 
-Run the approval, rejection, and recapture workflows with this session:
+Run the shared adjustment workflows and Approver-specific tests with this session:
 
 ```powershell
 npm run test:approver
@@ -384,3 +412,293 @@ For CI, provide the complete Approver storage-state JSON through
 `PLAYWRIGHT_APPROVER_AUTH_STATE` and run `npm run test:approver`. The existing
 GitHub Actions workflow runs the Admin suite; an Approver CI job must supply this
 separate secret.
+
+## Shared adjustment workflows
+
+The submission, approval, rejection, recapture, and Audit Trail & Notifications
+specs live in `tests/e2e/shared/`. Admin runs all five. Approver runs approval,
+rejection, recapture, and history with its saved login; Approvers cannot create
+or submit adjustments. Initiator reuses the shared submission
+spec and retains its own role-specific history workflow. Each role configuration
+selects only the shared workflows it supports; there are no copied Approver specs.
+Existing commands that select a test by filename still work.
+
+List the four shared Approver tests without changing application data:
+
+```powershell
+npm run test:approver -- "approve-shift-adjustment|reject-shift-adjustment|request-recapture|audit-trail-notifications" --list
+```
+
+Run them with:
+
+```powershell
+npm run test:approver -- "approve-shift-adjustment|reject-shift-adjustment|request-recapture|audit-trail-notifications"
+```
+
+Admin and Initiator submission tests use the shared Downloads PDF by default. Set `TEST_ATTACHMENT_PATH` to override it. To run submission on its own:
+
+```powershell
+$env:TEST_ATTACHMENT_PATH = 'C:\path\to\test-evidence.jpg'
+npm run test:admin -- add-new-shift-adjustment.spec.js
+```
+
+Approval and rejection each require a separate Submitted
+record; recapture requires a Submitted or Posting Failed record. These workflows
+change server data, and approval posts to SAP. Approver retries are disabled.
+Audit Trail & Notifications only views history and requires a record with history
+actions. Missing required records fail the corresponding test.
+
+## Employee Benefits login session
+
+Save a separate Employee Benefits session at `playwright/.auth/employee-benefits.json`:
+
+```powershell
+npm run auth:employee-benefits
+```
+
+Sign in with an account assigned the Employee Benefits role, navigate to Home,
+then press Enter in the terminal to save the session. The command saves the
+account's login; it does not assign or verify the application's role.
+Authentication files are excluded from Git. Run the same command again to
+refresh an expired session.
+
+The authentication profile uses `employee-benefits` as its role key and
+`PLAYWRIGHT_EMPLOYEE_BENEFITS_AUTH_STATE` as its separate CI secret. Run its shared workflow suite with `npm run test:employee-benefits`.
+
+
+## Employee Benefits shared tests
+
+```powershell
+npm run auth:employee-benefits
+npm run test:employee-benefits -- --list
+npm run test:employee-benefits
+```
+
+The dedicated configuration selects Home navigation, Help Centre navigation and FAQ
+checks, shift adjustment filters, search, recalled adjustment submission, cancellation, Audit
+Trail & Notifications, and Insights navigation with the Employee Benefits session.
+Employee Benefits entry files live in `tests/e2e/employee-benefits/` and import
+workflows from `tests/e2e/shared/`. Existing role entry files reuse the common
+checks with their own sessions and preserve their role-specific Home assertions.
+Employee Benefits Home checks now use the common navigation workflow described above; dashboard cards and creation permission remain unconfirmed.
+
+Run a single workflow by filename:
+
+```powershell
+npm run test:employee-benefits -- submit-recalled-adjustment.spec.js
+npm run test:employee-benefits -- insights-navigation.spec.js
+```
+
+Set `TEST_EMPLOYEE_BENEFITS_ABSENCE_TYPE` to override the filter default
+`Sick leave Paid`. Employee Benefits cannot request recapture. Its submission test
+selects an existing Recalled adjustment, submits its saved details for approval,
+and verifies that the same reference is listed as Submitted. It requires a Recalled
+adjustment with complete submission details and changes that existing record.
+Cancellation uses `TEST_CANCELLATION_*` settings and requires a Submitted or
+Posting Failed adjustment accessible to the account.
+History requires a record with history actions. Insights requires Insights access
+and a Posting Failures record for its valid-search check. Retries are disabled.
+
+For CI, supply `PLAYWRIGHT_EMPLOYEE_BENEFITS_AUTH_STATE` and run
+`npm run test:employee-benefits`.
+
+
+Approver entry files live in `tests/e2e/approver/` and import the shared Home,
+Help Centre, filters, Insights, approval, rejection, recapture, and history
+workflows. The Approver configuration selects only those entry files and uses
+its separate saved session. Run a workflow by its entry filename, for example:
+
+```powershell
+npm run test:approver -- request-recapture.spec.js
+```
+
+
+## Employee Benefits: close a Posting Failed adjustment
+
+```powershell
+npm run test:employee-benefits -- close-shift-adjustment.spec.js
+```
+
+The test clears filters and search, selects only Posting Failed, opens the first
+matching adjustment, and retains its reference. It confirms Close Record (No
+Action), waits for the completed closure result, and searches for the same
+reference under the Close Record (No Action) filter to verify the displayed
+Closed Record (No Action) status. This changes one existing server record and
+requires a Posting Failed adjustment accessible to the Employee Benefits account.
+A missing record fails the test. Retries are disabled to avoid closing another
+record. The shared closure spec runs through its Employee Benefits entry file
+and is excluded from the default Admin suite.
+
+## PDF regression reports
+
+Generate an Extent-style regression document using the existing Playwright tests:
+
+```powershell
+npm run test:regression
+npm run test:regression:initiator
+npm run test:regression:approver
+npm run test:regression:employee-benefits
+```
+
+The default role is Admin. Save that role's login using the corresponding
+`auth` command first. Chromium must be installed with
+`npx playwright install chromium`. No additional reporting dependency is needed.
+These commands execute the selected regression tests, including their existing
+submission, approval, deletion, cancellation, and other server changes.
+
+Select a workflow or test by filename or grep:
+
+```powershell
+npm run test:regression:admin -- home-page-navigation.spec.js
+npm run test:regression -- --role approver --grep "Home Page Navigation"
+```
+
+Each run saves `regression-report.pdf`, a self-contained HTML document, and JSON
+evidence under `regression-reports/<timestamp>-<role>-<process>/`. The runner prints
+the output path and returns the test exit code. PDF generation failures also fail
+the run, while retaining the HTML and JSON evidence. Output folders are excluded
+from Git. Existing test commands continue to run without regression screenshot
+capture. This is a custom Extent-style Playwright reporter, not the Java
+ExtentReports library.
+
+The PDF includes run start/end times in South African time, duration, environment
+URL, browser and viewport, role project, optional build/revision, a test index,
+actual and expected results, retries, skip reasons, named step durations, assertion
+errors, and screen evidence. Each screen has its timestamp, action or named-step
+description, URL, logged-in user, assigned role, identity source, and screenshot.
+Screenshots capture the visible viewport before/after browser actions and at
+named-step completion, including intermediate tabs and dialogs. Consecutive
+identical action screenshots are deduplicated; named steps retain their evidence.
+Only screens visited by the selected tests are documented. Screenshot failures,
+undetected users, and unverified roles are flagged explicitly.
+
+User names are read from the Home greeting or the profile menu's accessible label.
+Roles are read from visible profile-menu labels when available. For the complete
+name and assigned role on your application's profile/header, configure selectors
+that target those specific fields (replace the examples with real selectors):
+
+```powershell
+$env:REGRESSION_USER_SELECTOR = '[data-testid="current-user-name"]'
+$env:REGRESSION_ROLE_SELECTOR = '[data-testid="current-user-role"]'
+npm run test:regression:admin -- home-page-navigation.spec.js
+```
+
+The reporter remembers identity values between screens in the same browser page.
+It does not open the profile menu itself or change the account's permissions.
+Without an observed role, the configured test role is labelled
+"not verified in application". If needed, `REGRESSION_USER_NAME` and
+`REGRESSION_USER_ROLE` supply operator-declared fallback values; these are labelled
+"Operator supplied" rather than verified application identity. Values read from
+the UI take precedence. Set `REGRESSION_BUILD` and `REGRESSION_REVISION` to include
+release identifiers.
+
+New specs should import `test` and `expect` from
+`tests/support/regression-test.js` using the appropriate relative path. Use
+`test.step('Describe the screen and verification', async () => { ... })` for
+business-readable descriptions. For independent scroll positions or custom
+canvas interactions, add a named step after the screen is ready.
+
+Validate reporting against local sample screens without application access:
+
+```powershell
+npm run test:reporting
+```
+
+This check verifies screenshots for multiple screens, UI identity, a shared
+`beforeAll` browser session, an intentionally failing scenario, skipped tests,
+identity gaps, HTML escaping, and the generated PDF. The validation command
+succeeds when the expected failure is correctly documented. Its sample PDF is
+saved at `.report-validation/report-<timestamp>/regression-report.pdf`.
+
+PDF documents use the supplied Valterra Platinum logo on every page, with matching
+teal and blue-grey headings, table styling, and branded titles and footers. The
+logo is stored at assets/reporting/valterra-platinum.jpg, so report generation
+does not depend on the original OneDrive image path.
+
+Every PDF page also includes the supplied Integrove logo in its footer, alongside
+the document label and page numbers. The HTML document includes the same footer
+branding. The footer logo is stored at assets/reporting/integrove.png.
+
+
+## Regression scenario structure
+
+Reports follow the supplied Administrator Word document: Document Control,
+System Identification, Document Information, Document Overview, Table of Contents,
+and the four columns Test Steps, Expected Results, Screenshot Evidence, and Pass/Fail.
+Scenario details appear above the tables. Skipped tests are labelled Skipped;
+steps without verified outcomes and baseline reference cases are labelled Not assessed.
+The extracted baseline is stored in reporting/administrator-test-cases.json;
+the original Word document and its embedded images are not required for generation.
+
+Admin workflows link to related reference cases where the relationship is clear.
+These links are not full coverage claims. Other roles use the same report structure
+and only link Administrator baseline cases when explicitly annotated. Missing
+TC-036 and inconsistent source expectations are retained and flagged for review.
+Reference screenshots are not copied into current-run evidence.
+
+Business expectations can be supplied through named-step parameters:
+
+```javascript
+await test.step('Open the Home dashboard', async () => {
+  await home.goto();
+  await expect(page.getByRole('heading', { name: 'Recent Activities' })).toBeVisible();
+}, {
+  params: {
+    expectedResult: 'The Home dashboard displays Recent Activities.',
+    referenceCase: 'TC-002',
+    referenceSteps: [1, 2],
+  },
+});
+```
+
+Scenario metadata can be supplied with test.info().annotations using types
+prerequisite, expected-result, and reference-case. Expected results remain distinct
+from actual test statuses; observed assertions and their results are recorded in
+the verification log. Set REGRESSION_REPORT_AUTHOR to name the current report author.
+
+## All admin tests in one login session
+
+```powershell
+npm run test:regression:admin:session
+```
+
+This runner verifies the saved admin login once, then executes the full configured
+admin suite serially using the same browser context and tab. The parent process
+keeps that session alive across Playwright worker restarts after failures. Each
+test resets its viewport and timeouts; authentication and browser storage persist.
+Tests still navigate to their own starting screens. Reports include per-test
+session annotations and are saved as PDF, HTML, and JSON in the printed
+`regression-reports/<timestamp>-admin-single-session-<process>/` folder.
+
+To refresh an expired login in the same browser before the suite starts:
+
+```powershell
+npm run test:regression:admin:session -- --login
+```
+
+Sign in as Administrator and navigate to Home. Tests start automatically when the
+Home greeting becomes visible, and the refreshed login is saved for later runs.
+The existing tests retain their documented server-side changes and prerequisites.
+
+## Independent Master Data tests
+
+Master Data navigation, each reference-record lifecycle, exports, searches and
+filters, upload, column settings, User Management, integrations, notification
+validation, and audit filters have separate test results. The admin configuration
+uses one worker and the suite uses default mode, so a failure does not skip later
+tests. Playwright may restart that worker after a failure; only one worker runs
+at a time.
+
+Every test reloads Home and checks its authenticated user response. Configuration
+tests switch to Configuration themselves and open their own section. This also
+resets the shared tab when using the single-login-session runner. Record lifecycles
+create unique records and clean up within the same test. User activation, editing,
+role restoration, and deactivation stay together as one lifecycle with cleanup.
+
+Run all Master Data tests or select one case:
+
+```powershell
+npm run test:admin -- master-data.spec.js
+npm run test:admin -- master-data.spec.js --grep "creates, verifies, and deletes absence reasons"
+npm run test:admin -- master-data.spec.js --grep "exports User Management"
+```

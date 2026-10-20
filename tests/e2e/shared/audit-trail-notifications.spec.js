@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../../support/regression-test.js';
 import { HomePage } from '../../pages/home.page.js';
 import { AdminAdjustmentsPage } from '../../pages/admin-adjustments.page.js';
 
@@ -7,10 +7,9 @@ test('Navigate through Audit Trail & Notifications', async ({ page }) => {
   page.setDefaultTimeout(60_000);
   const home = new HomePage(page);
   const adjustments = new AdminAdjustmentsPage(page);
-  let statuses;
   let reference;
 
-  await test.step('Navigate to Shift Adjustment and select all statuses except Pending', async () => {
+  await test.step('Navigate to the Shift Adjustment list', async () => {
     await home.goto();
     const tab = page.getByRole('tab', { name: 'Shift Adjustment', exact: true });
     await tab.click();
@@ -19,12 +18,11 @@ test('Navigate through Audit Trail & Notifications', async ({ page }) => {
     await expect(page.getByRole('heading', { name: /Shift Adjustments \(\d+\)/ }))
       .toBeVisible({ timeout: 60_000 });
     await adjustments.clearFilters();
-    statuses = await adjustments.selectAllStatusesExceptPending();
-    await adjustments.expectFilteredAdjustments(statuses);
+    await page.getByRole('textbox', { name: 'Search', exact: true }).clear();
   });
 
-  await test.step('Select an adjustment with history actions from the filtered list', async () => {
-    reference = await adjustments.openFirstAdjustmentWithHistory(statuses);
+  await test.step('Select any adjustment with history actions from the list', async () => {
+    reference = await adjustments.openFirstAdjustmentWithHistory();
     test.info().annotations.push({ type: 'adjustment', description: reference });
   });
 

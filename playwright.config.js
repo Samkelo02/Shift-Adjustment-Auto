@@ -6,7 +6,16 @@ const authFile = path.resolve('playwright/.auth/user.json');
 
 export default defineConfig({
   testDir: './tests/e2e',
-  testMatch: ['**/admin/*.spec.js'],
+  testMatch: ['**/admin/*.spec.js', '**/shared/*.spec.js'],
+  testIgnore: [
+    '**/shared/home-page-navigation.spec.js',
+    '**/shared/help-centre-navigation.spec.js',
+    '**/shared/shift-adjustment-filters.spec.js',
+    '**/shared/search-shift-adjustments.spec.js',
+    '**/shared/cancel-shift-adjustment.spec.js',
+    '**/shared/close-shift-adjustment.spec.js',
+    '**/shared/insights-navigation.spec.js',
+  ],
   metadata: { authRole: 'admin' },
   globalSetup: './tests/support/global-setup.js',
   outputDir: 'test-results',

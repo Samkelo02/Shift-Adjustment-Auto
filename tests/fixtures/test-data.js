@@ -1,4 +1,6 @@
 import path from 'node:path';
+import { homedir } from 'node:os';
+import { existsSync } from 'node:fs';
 import { randomInt } from 'node:crypto';
 
 export const datesAreExplicit = Boolean(process.env.TEST_START_DATE || process.env.TEST_END_DATE);
@@ -36,12 +38,14 @@ function testDates() {
   return randomTestDates();
 }
 
+const defaultAttachmentPath = path.join(homedir(), 'Downloads', 'dummy_shift_adjustment_form.pdf');
+
 export const adjustmentData = {
   employeeSearch: process.env.TEST_EMPLOYEE ?? '80068191',
   employeeOption: process.env.TEST_EMPLOYEE_OPTION ?? 'Christiaan Van Den Berg',
   attachmentPath: process.env.TEST_ATTACHMENT_PATH
     ? path.resolve(process.env.TEST_ATTACHMENT_PATH)
-    : undefined,
+    : existsSync(defaultAttachmentPath) ? defaultAttachmentPath : undefined,
   ...testDates(),
   adjustmentType: process.env.TEST_ADJUSTMENT_TYPE ?? 'Sick Leave - SICK',
   absenceType: process.env.TEST_ABSENCE_TYPE ?? 'Sick leave Paid',

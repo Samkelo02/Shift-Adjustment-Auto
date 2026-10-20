@@ -1,5 +1,5 @@
 import { stat } from 'node:fs/promises';
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../support/regression-test.js';
 
 export class MasterDataPage {
   constructor(page) {
@@ -75,8 +75,16 @@ export class MasterDataPage {
       const [response] = await Promise.all([
         this.page.waitForResponse(response => {
           const url = new URL(response.url());
+          if (response.request().method() !== 'GET') return false;
+          if (this.referenceSection?.tab === 'Medical Practitioner') {
+            // This table uses an unversioned endpoint and OData contains filters,
+            // rather than the $search parameter used by other master-data tables.
+            if (url.pathname !== '/api/master-data/medical-practitioners/MedicalPractitioners') return false;
+            const filter = url.searchParams.get('$filter') || '';
+            const term = filter.match(/contains\(\s*practiceNumber\s*,\s*'((?:[^']|'')*)'\s*\)/);
+            return query ? Boolean(term && term[1].replaceAll("''", "'") === query) : !term;
+          }
           return url.pathname.startsWith('/api/v1/master-data/')
-            && response.request().method() === 'GET'
             && (url.searchParams.get('$search') ?? '') === query;
         }, { timeout: 60_000 }),
         (async () => {

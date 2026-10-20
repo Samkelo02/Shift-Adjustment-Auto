@@ -7,7 +7,7 @@ import { authProfile } from '../tests/support/auth-profiles.js';
 
 const args = process.argv.slice(2);
 if (args.length && (args.length !== 2 || args[0] !== '--role')) {
-  throw new Error('Usage: npm run auth -- --role <admin|initiator|approver>');
+  throw new Error('Usage: npm run auth -- --role <admin|initiator|approver|employee-benefits>');
 }
 const role = args[1] ?? 'admin';
 const authFile = authProfile(role).file;
